@@ -1,169 +1,150 @@
-# Portfolio Template
+![Portfolio Template Banner](public/banner.png)
 
-A modern, performant portfolio template built with Next.js 16, Supabase, and Vercel Analytics. Features a secure admin dashboard for content management without redeployment.
+<div align="center">
 
-**Fully configurable via environment variables** — no code changes needed for personalization.
+# Next.js Portfolio Template
+
+[![Next.js](https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+A minimal, high-performance portfolio template designed for developers and designers. Built with **Next.js 16**, **Supabase**, and modern web standards. Features a fully functional **Admin Dashboard** for managing content without code changes.
+
+[Features](#-features) • [Getting Started](#-getting-started) • [Deployment](#-deployment) • [Customization](#-customization)
+
+</div>
+
+---
 
 ## ✨ Features
 
-### Public Site
-- **Landing Page** — Minimal, impactful introduction with customizable branding
-- **Works** — Project case studies with problem/constraints/decisions/outcome structure
-- **Blog** — Technical writing with tag support and markdown rendering
-- **About** — Experience timeline, skills, education, and contact information
-- **SEO Optimized** — Dynamic sitemap, OpenGraph tags, JSON-LD, robots.txt
+### 🎨 Public Interface
+- **Modern & Minimalist**: Clean aesthetics with focus on content and typography.
+- **Dynamic Content**: Works, Writing (Blog), and About pages powered by Supabase.
+- **SEO Optimized**: Automatic sitemap generation, OpenGraph tags, and JSON-LD structured data.
+- **Performance First**: Built on Next.js App Router with server components and image optimization.
+- **Responsive**: Mobile-first design that adapts seamlessly to all devices.
 
-### Admin Panel (`/ssh`)
-- **Magic Link Auth** — Secure email-based authentication
-- **MFA Support** — Optional TOTP two-factor authentication
-- **Works Management** — Full CRUD with draft/publish workflow
-- **Writing Management** — Create and manage blog posts
-- **Profile & Experience** — Update your bio and work history
-- **Settings** — Configure site metadata and social links
+### 🛡️ Admin Dashboard (`/ssh`)
+- **Secure Authentication**: Magic Link login via Supabase Auth.
+- **Role-Based Access**: Restricted to whitelisted admin emails.
+- **MFA Support**: Optional TOTP (Time-based One-Time Password) for extra security.
+- **Content Management System**:
+  - **Works**: CRUD operations for projects with draft/published states.
+  - **Writing**: Full markdown editor for blog posts.
+  - **Profile**: Update bio, experience, skills, and social links instantly.
 
 ## 🛠 Tech Stack
 
-- **Framework**: Next.js 16 (App Router, Turbopack)
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth (Magic Link + TOTP MFA)
-- **Styling**: CSS Modules with design tokens
-- **Analytics**: Vercel Analytics
-- **Deployment**: Vercel
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **Styling**: CSS Modules with Design Tokens
+- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
+- **Deployment**: [Vercel](https://vercel.com/)
 
-## 🚀 Quick Start
+---
 
-### 1. Clone & Install
+## 🚀 Getting Started
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/itsyashvardhan/portfolio.git my-portfolio
+git clone https://github.com/yourusername/portfolio-template.git my-portfolio
 cd my-portfolio
 npm install
 ```
 
-### 2. Configure Environment
+### 2. Environment Setup
+
+Create a `.env.local` file in the root directory:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` with your details:
+Fill in your configuration:
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Site
-NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+# Admin Access
+ADMIN_EMAILS=your_email@example.com
 
-# Personal Info (for SEO & metadata)
-NEXT_PUBLIC_OWNER_NAME=Your Name
-NEXT_PUBLIC_OWNER_TITLE=Your Title
-NEXT_PUBLIC_OWNER_EMAIL=your@email.com
-NEXT_PUBLIC_OWNER_GITHUB=https://github.com/username
-NEXT_PUBLIC_OWNER_LINKEDIN=https://linkedin.com/in/username
-NEXT_PUBLIC_OWNER_TWITTER=@username
-
-# Landing Page Branding
+# Branding
 NEXT_PUBLIC_HERO_NAME=Your Name
-NEXT_PUBLIC_HERO_PHONETIC=
-NEXT_PUBLIC_HERO_TAGLINE=Your tagline here.
-NEXT_PUBLIC_LOGO_TEXT=◈
+NEXT_PUBLIC_HERO_PHONETIC=your-pho-net-ic
+NEXT_PUBLIC_HERO_TAGLINE=Your professional tagline.
+NEXT_PUBLIC_LOGO_TEXT=LP
 
-# Admin
-ADMIN_EMAILS=your@email.com
+# Owner Info (SEO)
+NEXT_PUBLIC_OWNER_NAME=Your Name
+NEXT_PUBLIC_OWNER_TITLE=Software Engineer
+NEXT_PUBLIC_OWNER_EMAIL=hello@example.com
+NEXT_PUBLIC_OWNER_GITHUB=https://github.com/yourusername
+NEXT_PUBLIC_OWNER_LINKEDIN=https://linkedin.com/in/yourusername
+NEXT_PUBLIC_OWNER_TWITTER=@yourhandle
 ```
 
-### 3. Set Up Database
+### 3. Database Setup
 
-1. Create a [Supabase](https://supabase.com) project
-2. Go to SQL Editor and run `supabase/schema.sql`
-3. Add your email to the `admin_emails` table:
-   ```sql
-   INSERT INTO admin_emails (email) VALUES ('your@email.com');
-   ```
+1. Create a new project on [Supabase](https://supabase.com).
+2. Go to the SQL Editor in your Supabase dashboard.
+3. Run the content of `supabase/schema.sql`.
+4. (Optional) Run `supabase/sample-data.sql` to seed initial data.
 
-### 4. Run Development Server
+### 4. Run Locally
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
-
-## 📦 Deploy to Vercel
-
-1. Push to GitHub
-2. Import to [Vercel](https://vercel.com/new)
-3. Add all environment variables from `.env.local`
-4. In Supabase, add redirect URL: `https://yourdomain.com/auth/callback`
-5. Deploy!
-
-## 📁 Project Structure
-
-```
-src/
-├── app/
-│   ├── (public)/          # Public routes (works, blog, about)
-│   ├── ssh/               # Admin panel (protected)
-│   │   ├── (admin)/       # Dashboard, works, writing, settings
-│   │   └── login/         # Magic link login
-│   ├── api/               # API routes
-│   └── layout.tsx         # Root layout with SEO
-├── components/            # Shared components
-├── lib/
-│   ├── data.ts            # Data fetching utilities
-│   ├── supabase/          # Supabase client setup
-│   └── types.ts           # TypeScript definitions
-└── middleware.ts          # Auth session refresh
-
-supabase/
-├── schema.sql             # Database schema
-├── sample-data.sql        # Template for your data
-└── migrations/            # Schema migrations
-```
-
-## 🎨 Customization
-
-### Branding
-All branding is controlled via environment variables:
-- `NEXT_PUBLIC_HERO_NAME` — Large name on landing page
-- `NEXT_PUBLIC_LOGO_TEXT` — Logo in navigation (supports Devanagari, emoji, etc.)
-- `NEXT_PUBLIC_HERO_TAGLINE` — Tagline on landing page
-
-### Styling
-Design tokens are in `src/app/globals.css`. The template uses:
-- CSS Variables for theming
-- Dark mode support (automatic)
-- Monochrome palette with accent colors
-
-### OG Image
-Replace `public/og-image.png` with your own 1200x630 image.
-
-## 📝 Content Management
-
-Access the admin dashboard at `/ssh`:
-
-1. Click "Send Magic Link" to receive login email
-2. Manage your content:
-   - **Works** — Projects with case study structure
-   - **Writing** — Blog posts with markdown
-   - **Profile** — Bio, title, location
-   - **Experience** — Work history
-   - **Skills** — Categorized skill list
-   - **Settings** — Site metadata
-
-## 🔒 Security
-
-- Admin access controlled via `admin_emails` table
-- Row Level Security (RLS) on all tables
-- Optional MFA with TOTP authenticator apps
-- Magic link authentication (no passwords)
-
-## 📄 License
-
-MIT — feel free to use this template for your own portfolio!
+Visit `http://localhost:3000` to see your new portfolio.
 
 ---
 
-Built with ❤️ using Next.js, Supabase, and Vercel.
+## 📦 Deployment
+
+The easiest way to deploy is with Vercel.
+
+1. Push your code to a GitHub repository.
+2. Import the project into Vercel.
+3. Add the **Environment Variables** (copy from your `.env.local`).
+4. Hit **Deploy**.
+
+> **Note**: Don't forget to update `NEXT_PUBLIC_SITE_URL` to your production domain in the Vercel dashboard.
+
+---
+
+## 🎨 Customization
+
+This template is designed to be "config-first". Most branding can be changed via environment variables.
+
+### changing the Banner
+Replace `public/banner.png` with your own 1200x600 branding image.
+
+### Styling
+Core styles are defined in `src/app/globals.css` using CSS variables. You can easily update the color palette there.
+
+```css
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --accent: #333333;
+  /* ... */
+}
+```
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+  <sub>Built with intention.</sub>
+</div>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import styles from './page.module.css'
 
 // Environment variables for branding
-const heroName = process.env.NEXT_PUBLIC_HERO_NAME || 'Your Name'
+const heroName = process.env.NEXT_PUBLIC_HERO_NAME || 'यशवर्धन'
 const heroPhonetic = process.env.NEXT_PUBLIC_HERO_PHONETIC || ''
 const heroTagline = process.env.NEXT_PUBLIC_HERO_TAGLINE || 'I design systems that ship.'
 
