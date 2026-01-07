@@ -1,0 +1,121 @@
+.page {
+    max-width: 700px;
+}
+
+.title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-6);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+.input,
+.textarea,
+.select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    transition: border-color var(--transition-fast);
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.select {
+    cursor: pointer;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    cursor: pointer;
+}
+
+.checkbox input {
+    width: 16px;
+    height: 16px;
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.cancelBtn {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+}
+
+.cancelBtn:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+}
+
+.saveBtn {
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    border-radius: 6px;
+    transition: opacity var(--transition-fast);
+}
+
+.saveBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.saveBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .row {
+        grid-template-columns: 1fr;
+    }
+}

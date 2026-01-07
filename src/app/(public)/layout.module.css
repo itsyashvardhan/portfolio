@@ -1,0 +1,87 @@
+.layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    border-bottom: 1px solid var(--color-border);
+    z-index: 100;
+    /* Fallback for devices without backdrop-filter support */
+    background: var(--color-bg);
+}
+
+/* Only apply blur on devices that support it well */
+@supports (backdrop-filter: blur(8px)) {
+    .nav {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background: color-mix(in srgb, var(--color-bg), transparent 15%);
+    }
+}
+
+.navContainer {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    letter-spacing: -0.02em;
+}
+
+.links {
+    display: flex;
+    gap: var(--space-6);
+}
+
+.link {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.link:hover {
+    color: var(--color-text);
+}
+
+.main {
+    flex: 1;
+    padding-top: var(--nav-height);
+}
+
+.footer {
+    padding: var(--space-8) 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.footer p {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+}
+
+@media (max-width: 640px) {
+    .nav {
+        /* Disable blur on mobile for performance */
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: var(--color-bg);
+    }
+
+    .links {
+        gap: var(--space-4);
+    }
+
+    .link {
+        font-size: var(--text-xs);
+    }
+}
