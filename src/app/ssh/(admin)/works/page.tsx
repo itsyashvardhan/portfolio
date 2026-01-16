@@ -9,21 +9,27 @@ import styles from './page.module.css'
 export default function AdminWorksPage() {
     const [works, setWorks] = useState<Work[]>([])
     const [loading, setLoading] = useState(true)
+    const [refreshKey, setRefreshKey] = useState(0)
     const supabase = createClient()
 
     useEffect(() => {
-        fetchWorks()
-    }, [])
+        let isMounted = true
+        const loadWorks = async () => {
+            const { data } = await supabase
+                .from('works')
+                .select('*')
+                .order('display_order', { ascending: true })
 
-    const fetchWorks = async () => {
-        const { data } = await supabase
-            .from('works')
-            .select('*')
-            .order('display_order', { ascending: true })
+            if (isMounted) {
+                if (data) setWorks(data)
+                setLoading(false)
+            }
+        }
+        loadWorks()
+        return () => { isMounted = false }
+    }, [supabase, refreshKey])
 
-        if (data) setWorks(data)
-        setLoading(false)
-    }
+    const refresh = () => setRefreshKey(k => k + 1)
 
     const toggleStatus = async (work: Work) => {
         const newStatus = work.status === 'published' ? 'draft' : 'published'
@@ -32,14 +38,14 @@ export default function AdminWorksPage() {
             .update({ status: newStatus })
             .eq('id', work.id)
 
-        fetchWorks()
+        refresh()
     }
 
     const deleteWork = async (id: string) => {
         if (!confirm('Are you sure you want to delete this work?')) return
 
         await supabase.from('works').delete().eq('id', id)
-        fetchWorks()
+        refresh()
     }
 
     if (loading) return <p>Loading...</p>

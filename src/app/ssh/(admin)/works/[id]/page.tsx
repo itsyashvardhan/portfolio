@@ -35,46 +35,50 @@ export default function EditWorkPage() {
     })
 
     useEffect(() => {
-        if (id) fetchWork()
-    }, [id])
+        if (!id) return
+        let isMounted = true
+        const loadWork = async () => {
+            const { data, error } = await supabase
+                .from('works')
+                .select('*')
+                .eq('id', id)
+                .single()
 
-    const fetchWork = async () => {
-        const { data, error } = await supabase
-            .from('works')
-            .select('*')
-            .eq('id', id)
-            .single()
+            if (!isMounted) return
 
-        if (error) {
-            alert('Error fetching work: ' + error.message)
-            router.push('/ssh/works')
-            return
+            if (error) {
+                alert('Error fetching work: ' + error.message)
+                router.push('/ssh/works')
+                return
+            }
+
+            if (data) {
+                setFormData({
+                    title: data.title || '',
+                    slug: data.slug || '',
+                    role: data.role || '',
+                    description: data.description || '',
+                    problem: data.problem || '',
+                    constraints: data.constraints || '',
+                    decisions: data.decisions || '',
+                    tech_context: data.tech_context || '',
+                    outcome: data.outcome || '',
+                    body: data.body || '',
+                    tech_stack: data.tech_stack?.join(', ') || '',
+                    repo_url: data.repo_url || '',
+                    demo_url: data.demo_url || '',
+                    demo_label: data.demo_label || '',
+                    project_status: data.project_status || 'active',
+                    featured: data.featured || false,
+                    status: data.status || 'draft',
+                    display_order: data.display_order || 0,
+                })
+            }
+            setLoading(false)
         }
-
-        if (data) {
-            setFormData({
-                title: data.title || '',
-                slug: data.slug || '',
-                role: data.role || '',
-                description: data.description || '',
-                problem: data.problem || '',
-                constraints: data.constraints || '',
-                decisions: data.decisions || '',
-                tech_context: data.tech_context || '',
-                outcome: data.outcome || '',
-                body: data.body || '',
-                tech_stack: data.tech_stack?.join(', ') || '',
-                repo_url: data.repo_url || '',
-                demo_url: data.demo_url || '',
-                demo_label: data.demo_label || '',
-                project_status: data.project_status || 'active',
-                featured: data.featured || false,
-                status: data.status || 'draft',
-                display_order: data.display_order || 0,
-            })
-        }
-        setLoading(false)
-    }
+        loadWork()
+        return () => { isMounted = false }
+    }, [id, router, supabase])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -179,7 +183,7 @@ export default function EditWorkPage() {
                         <label className={styles.label}>Project Status</label>
                         <select
                             value={formData.project_status}
-                            onChange={(e) => setFormData({ ...formData, project_status: e.target.value as any })}
+                            onChange={(e) => setFormData({ ...formData, project_status: e.target.value as 'active' | 'archived' | 'in-progress' })}
                             className={styles.select}
                         >
                             <option value="active">Active</option>
@@ -221,7 +225,7 @@ export default function EditWorkPage() {
                         className={styles.input}
                         placeholder="Live Demo → (default if empty)"
                     />
-                    <span className={styles.hint}>Custom text for the demo link button (e.g., "Live", "Try It", "View Site")</span>
+                    <span className={styles.hint}>Custom text for the demo link button (e.g., &quot;Live&quot;, &quot;Try It&quot;, &quot;View Site&quot;)</span>
                 </div>
 
                 <div className={styles.field}>

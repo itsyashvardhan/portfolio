@@ -10,7 +10,7 @@ export const revalidate = 3600
 
 export const metadata: Metadata = {
     title: 'About',
-    description: 'Product & Solutions Engineer specializing in systems design and building products with intention.',
+    description: 'Product Manager & Solutions Engineer specializing in AI solutions, analytics, and project management.',
 }
 
 export default async function AboutPage() {
@@ -103,11 +103,11 @@ export default async function AboutPage() {
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Skills</h2>
                             <div className={styles.skillsGrid}>
-                                {skills.languages.length > 0 && (
+                                {skills.tools.length > 0 && (
                                     <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Languages</h3>
+                                        <h3 className={styles.skillCategoryTitle}>Tools & Platforms</h3>
                                         <div className={styles.skillTags}>
-                                            {skills.languages.map((skill) => (
+                                            {skills.tools.map((skill) => (
                                                 <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
                                             ))}
                                         </div>
@@ -116,7 +116,7 @@ export default async function AboutPage() {
 
                                 {skills.frameworks.length > 0 && (
                                     <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Frameworks</h3>
+                                        <h3 className={styles.skillCategoryTitle}>Frameworks & Methods</h3>
                                         <div className={styles.skillTags}>
                                             {skills.frameworks.map((skill) => (
                                                 <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
@@ -125,11 +125,33 @@ export default async function AboutPage() {
                                     </div>
                                 )}
 
-                                {skills.tools.length > 0 && (
+                                {skills.languages.length > 0 && (
                                     <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Tools</h3>
+                                        <h3 className={styles.skillCategoryTitle}>Technical Skills</h3>
                                         <div className={styles.skillTags}>
-                                            {skills.tools.map((skill) => (
+                                            {skills.languages.map((skill) => (
+                                                <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {skills['soft-skills'].length > 0 && (
+                                    <div className={styles.skillCategory}>
+                                        <h3 className={styles.skillCategoryTitle}>Core Competencies</h3>
+                                        <div className={styles.skillTags}>
+                                            {skills['soft-skills'].map((skill) => (
+                                                <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {skills.general.length > 0 && (
+                                    <div className={styles.skillCategory}>
+                                        <h3 className={styles.skillCategoryTitle}>Domain Expertise</h3>
+                                        <div className={styles.skillTags}>
+                                            {skills.general.map((skill) => (
                                                 <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
                                             ))}
                                         </div>
@@ -196,7 +218,7 @@ export default async function AboutPage() {
                     <section className={`${styles.section} ${styles.contactSection}`}>
                         <h2 className={styles.sectionTitle}>Get in Touch</h2>
                         <p className={styles.contactIntro}>
-                            Open to product engineering roles, collaborations, and tiramisu.
+                            Open to product, analytics, and solutions engineering roles.
                         </p>
                         <div className={styles.socialLinks}>
                             {socialLinks.map((link) => (

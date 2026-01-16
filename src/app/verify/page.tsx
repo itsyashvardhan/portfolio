@@ -20,7 +20,7 @@ export default function VerifyPage() {
             }
         }
         checkSession()
-    }, [])
+    }, [router, supabase.auth])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -38,7 +38,7 @@ export default function VerifyPage() {
 
         const factorId = factors.totp[0].id
 
-        const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+        const { error } = await supabase.auth.mfa.challengeAndVerify({
             factorId,
             code
         })

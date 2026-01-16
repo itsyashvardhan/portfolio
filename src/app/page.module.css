@@ -48,13 +48,20 @@
 }
 
 .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     z-index: 1;
+    /* No flex:1, let content be naturally centered by parent */
 }
 
 /* Header & Tagline */
 .header {
     margin-bottom: 0;
+    padding-top: 7.5rem;
+    /* Compensate for nav height below to center name visually */
     animation: nameEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -129,7 +136,7 @@
     display: flex;
     justify-content: center;
     gap: var(--space-12);
-    margin-top: var(--space-12);
+    margin-top: var(--space-8);
     position: relative;
     animation: navEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
     opacity: 0;

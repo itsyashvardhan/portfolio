@@ -10,6 +10,8 @@ interface Blog {
     slug: string
     body: string
     excerpt: string
+    banner_image?: string
+    read_time?: number
     tags: string[]
     status: 'draft' | 'published'
     created_at: string
@@ -20,6 +22,7 @@ export default function AdminBlogPage() {
     const [Blogs, setBlogs] = useState<Blog[]>([])
     const [loading, setLoading] = useState(true)
     const [editingId, setEditingId] = useState<string | null>(null)
+    const [refreshKey, setRefreshKey] = useState(0)
     const [formData, setFormData] = useState({
         title: '',
         slug: '',
@@ -33,18 +36,23 @@ export default function AdminBlogPage() {
     const supabase = createClient()
 
     useEffect(() => {
-        fetchBlogs()
-    }, [])
+        let isMounted = true
+        const loadBlogs = async () => {
+            const { data } = await supabase
+                .from('Blog')
+                .select('*')
+                .order('created_at', { ascending: false })
 
-    const fetchBlogs = async () => {
-        const { data } = await supabase
-            .from('Blog')
-            .select('*')
-            .order('created_at', { ascending: false })
+            if (isMounted) {
+                if (data) setBlogs(data)
+                setLoading(false)
+            }
+        }
+        loadBlogs()
+        return () => { isMounted = false }
+    }, [supabase, refreshKey])
 
-        if (data) setBlogs(data)
-        setLoading(false)
-    }
+    const refresh = () => setRefreshKey(k => k + 1)
 
     const generateSlug = (title: string) => {
         return title.toLowerCase()
@@ -75,18 +83,18 @@ export default function AdminBlogPage() {
         setEditingId(null)
     }
 
-    const startEdit = (Blog: any) => {
+    const startEdit = (blog: Blog) => {
         setFormData({
-            title: Blog.title,
-            slug: Blog.slug,
-            body: Blog.body,
-            excerpt: Blog.excerpt || '',
-            banner_image: Blog.banner_image || '',
-            read_time: Blog.read_time || 5,
-            tags: Blog.tags?.join(', ') || '',
-            status: Blog.status,
+            title: blog.title,
+            slug: blog.slug,
+            body: blog.body,
+            excerpt: blog.excerpt || '',
+            banner_image: blog.banner_image || '',
+            read_time: blog.read_time || 5,
+            tags: blog.tags?.join(', ') || '',
+            status: blog.status,
         })
-        setEditingId(Blog.id)
+        setEditingId(blog.id)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -116,13 +124,13 @@ export default function AdminBlogPage() {
         }
 
         resetForm()
-        fetchBlogs()
+        refresh()
     }
 
     const deleteBlog = async (id: string) => {
         if (!confirm('Are you sure you want to delete this?')) return
         await supabase.from('Blog').delete().eq('id', id)
-        fetchBlogs()
+        refresh()
     }
 
     const toggleStatus = async (Blog: Blog) => {
@@ -131,7 +139,7 @@ export default function AdminBlogPage() {
             .from('Blog')
             .update({ status: newStatus })
             .eq('id', Blog.id)
-        fetchBlogs()
+        refresh()
     }
 
     if (loading) return <p>Loading...</p>

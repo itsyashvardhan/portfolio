@@ -145,7 +145,7 @@ export default function NewWorkPage() {
                         <label className={styles.label}>Project Status</label>
                         <select
                             value={formData.project_status}
-                            onChange={(e) => setFormData({ ...formData, project_status: e.target.value as any })}
+                            onChange={(e) => setFormData({ ...formData, project_status: e.target.value as 'active' | 'archived' | 'in-progress' })}
                             className={styles.select}
                         >
                             <option value="active">Active</option>
@@ -187,7 +187,7 @@ export default function NewWorkPage() {
                         className={styles.input}
                         placeholder="Live Demo → (default if empty)"
                     />
-                    <span className={styles.hint}>Custom text for the demo link button (e.g., "Live", "Try It", "View Site")</span>
+                    <span className={styles.hint}>Custom text for the demo link button (e.g., &quot;Live&quot;, &quot;Try It&quot;, &quot;View Site&quot;)</span>
                 </div>
 
                 <div className={styles.field}>

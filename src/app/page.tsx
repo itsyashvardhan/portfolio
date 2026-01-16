@@ -4,7 +4,7 @@ import styles from './page.module.css'
 // Environment variables for branding
 const heroName = process.env.NEXT_PUBLIC_HERO_NAME || 'यशवर्धन'
 const heroPhonetic = process.env.NEXT_PUBLIC_HERO_PHONETIC || ''
-const heroTagline = process.env.NEXT_PUBLIC_HERO_TAGLINE || 'I design systems that ship.'
+const heroTagline = process.env.NEXT_PUBLIC_HERO_TAGLINE || ''
 
 export default function Home() {
   return (
@@ -31,11 +31,6 @@ export default function Home() {
           </Link>
         </nav>
       </div>
-
-      {/* Subtle Footer */}
-      <footer className={styles.footer}>
-        <span className={styles.copyright}>© 2026 Crafted with Intention</span>
-      </footer>
     </div>
   )
 }

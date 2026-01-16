@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import styles from '../experience/page.module.css'
 
+type SkillCategory = 'languages' | 'frameworks' | 'tools' | 'soft-skills' | 'general'
+
 interface Skill {
     id: string
     name: string
-    category: 'languages' | 'frameworks' | 'tools' | 'soft-skills' | 'general'
+    category: SkillCategory
     proficiency: number
     display_order: number
 }
@@ -15,28 +17,34 @@ interface Skill {
 export default function AdminSkillsPage() {
     const [skills, setSkills] = useState<Skill[]>([])
     const [loading, setLoading] = useState(true)
+    const [refreshKey, setRefreshKey] = useState(0)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [formData, setFormData] = useState({
         name: '',
-        category: 'general' as any,
+        category: 'general' as SkillCategory,
         proficiency: 80,
         display_order: 0,
     })
     const supabase = createClient()
 
     useEffect(() => {
-        fetchSkills()
-    }, [])
+        let isMounted = true
+        const loadSkills = async () => {
+            const { data } = await supabase
+                .from('skills')
+                .select('*')
+                .order('display_order', { ascending: true })
 
-    const fetchSkills = async () => {
-        const { data } = await supabase
-            .from('skills')
-            .select('*')
-            .order('display_order', { ascending: true })
+            if (isMounted) {
+                if (data) setSkills(data)
+                setLoading(false)
+            }
+        }
+        loadSkills()
+        return () => { isMounted = false }
+    }, [supabase, refreshKey])
 
-        if (data) setSkills(data)
-        setLoading(false)
-    }
+    const refresh = () => setRefreshKey(k => k + 1)
 
     const resetForm = () => {
         setFormData({
@@ -73,13 +81,13 @@ export default function AdminSkillsPage() {
         }
 
         resetForm()
-        fetchSkills()
+        refresh()
     }
 
     const deleteSkill = async (id: string) => {
         if (!confirm('Are you sure?')) return
         await supabase.from('skills').delete().eq('id', id)
-        fetchSkills()
+        refresh()
     }
 
     if (loading) return <div className={styles.page}><p>Loading...</p></div>
@@ -106,7 +114,7 @@ export default function AdminSkillsPage() {
                         <label className={styles.label}>Category</label>
                         <select
                             value={formData.category}
-                            onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value as SkillCategory })}
                             className={styles.select}
                         >
                             <option value="languages">Languages</option>

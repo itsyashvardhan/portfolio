@@ -48,10 +48,10 @@ export const metadata: Metadata = {
     ownerName,
     "Product Engineer",
     "Solutions Engineer",
-    "Full Stack Developer",
+    "AI Developer",
     "Systems Designer",
     "Portfolio",
-    "Next.js Developer",
+    "Next.js",
     "TypeScript",
   ],
 
@@ -134,7 +134,7 @@ export default function RootLayout({
       ownerGithub,
       ownerLinkedin,
     ],
-    knowsAbout: ['Product Engineering', 'Systems Design', 'Full Stack Development', 'TypeScript', 'Next.js'],
+    knowsAbout: ['Product Engineering', 'Systems Design', 'Development', 'TypeScript', 'Next.js'],
   };
 
   return (
