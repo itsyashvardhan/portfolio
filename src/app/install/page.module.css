@@ -454,6 +454,88 @@
     max-width: 100%;
 }
 
+/* ===== Coming Soon Card ===== */
+.comingSoonCard {
+    text-align: center;
+    padding: var(--space-8) var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+}
+
+.comingSoonIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--space-4);
+    background: linear-gradient(135deg, rgba(var(--color-accent-rgb), 0.15), rgba(var(--color-accent-rgb), 0.05));
+    border-radius: 50%;
+    color: var(--color-accent);
+}
+
+.comingSoonTitle {
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    margin: 0 0 var(--space-3) 0;
+    letter-spacing: -0.02em;
+}
+
+.comingSoonText {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto var(--space-6);
+}
+
+.comingSoonActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.comingSoonBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    border-radius: 10px;
+    transition: all var(--transition-base);
+}
+
+.comingSoonBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.comingSoonBtnAlt {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    background: transparent;
+    color: var(--color-text);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.comingSoonBtnAlt:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-text-tertiary);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 1100px) {
     .docsLayout {

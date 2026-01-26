@@ -14,6 +14,7 @@ interface PlatformConfig {
     commandLabel: string
     hint: string
     requirements: string[]
+    comingSoon?: boolean
 }
 
 // Platform icons
@@ -54,7 +55,6 @@ export default function InstallPage() {
         }
     }, [])
 
-    const DEB_DOWNLOAD_URL = 'https://github.com/itsyashvardhan/spectre/releases/download/untagged-8f29264082a7b427b4e8/spectre_1.0.0_all.deb'
 
     const platformConfigs: Record<Platform, PlatformConfig> = {
         macOS: {
@@ -68,7 +68,8 @@ export default function InstallPage() {
                 'macOS 11.0 Big Sur or later',
                 'curl (pre-installed)',
                 'Terminal or iTerm2'
-            ]
+            ],
+            comingSoon: true
         },
         Linux: {
             icon: <LinuxIcon />,
@@ -94,7 +95,8 @@ export default function InstallPage() {
                 'Windows 10 (1903+) or Windows 11',
                 'PowerShell 5.1 or later',
                 'Administrator privileges'
-            ]
+            ],
+            comingSoon: true
         }
     }
 
@@ -178,94 +180,88 @@ export default function InstallPage() {
                     {/* Install Command Section */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>Quick Install</h2>
-                        <p className={styles.sectionDesc}>
-                            Copy and paste the following command into your {currentConfig.commandLabel}:
-                        </p>
 
-                        <div className={styles.codeBlock}>
-                            <div className={styles.codeHeader}>
-                                <span className={styles.codeLabel}>{currentConfig.commandLabel}</span>
-                                <button onClick={handleCopy} className={styles.copyBtn}>
-                                    {copied ? (
-                                        <>
-                                            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-                                                <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
-                                            </svg>
-                                            Copied
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-                                                <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" />
-                                                <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" />
-                                            </svg>
-                                            Copy
-                                        </>
-                                    )}
-                                </button>
+                        {currentConfig.comingSoon ? (
+                            <div className={styles.comingSoonCard}>
+                                <div className={styles.comingSoonIcon}>
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                                    </svg>
+                                </div>
+                                <h3 className={styles.comingSoonTitle}>Coming Soon</h3>
+                                <p className={styles.comingSoonText}>
+                                    {currentConfig.title} support is currently under development.
+                                    We&apos;re working hard to bring Spectre to your platform.
+                                </p>
+                                <div className={styles.comingSoonActions}>
+                                    <a
+                                        href="https://github.com/itsyashvardhan/spectre"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.comingSoonBtn}
+                                    >
+                                        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                                        </svg>
+                                        Watch on GitHub
+                                    </a>
+                                    <button
+                                        onClick={() => setPlatform('Linux')}
+                                        className={styles.comingSoonBtnAlt}
+                                    >
+                                        Try Linux Version
+                                    </button>
+                                </div>
                             </div>
-                            <div className={styles.codeContent}>
-                                <code>
-                                    <span className={styles.codeDim}>$</span>{' '}
-                                    {platform === 'Windows' ? (
-                                        <>
-                                            <span className={styles.codeCmd}>irm</span>{' '}
-                                            <span className={styles.codeUrl}>https://yashvs.is-a.dev/install-windows.ps1</span>{' '}
-                                            <span className={styles.codePipe}>|</span>{' '}
-                                            <span className={styles.codeCmd}>iex</span>
-                                        </>
-                                    ) : platform === 'macOS' ? (
-                                        <>
-                                            <span className={styles.codeCmd}>curl</span>{' '}
-                                            <span className={styles.codeFlag}>-sSL</span>{' '}
-                                            <span className={styles.codeUrl}>https://yashvs.is-a.dev/install-macos.sh</span>{' '}
-                                            <span className={styles.codePipe}>|</span>{' '}
-                                            <span className={styles.codeCmd}>bash</span>
-                                        </>
-                                    ) : (
-                                        <>
+                        ) : (
+                            <>
+                                <p className={styles.sectionDesc}>
+                                    Copy and paste the following command into your {currentConfig.commandLabel}:
+                                </p>
+
+                                <div className={styles.codeBlock}>
+                                    <div className={styles.codeHeader}>
+                                        <span className={styles.codeLabel}>{currentConfig.commandLabel}</span>
+                                        <button onClick={handleCopy} className={styles.copyBtn}>
+                                            {copied ? (
+                                                <>
+                                                    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+                                                        <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
+                                                    </svg>
+                                                    Copied
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+                                                        <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" />
+                                                        <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" />
+                                                    </svg>
+                                                    Copy
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                    <div className={styles.codeContent}>
+                                        <code>
+                                            <span className={styles.codeDim}>$</span>{' '}
                                             <span className={styles.codeCmd}>curl</span>{' '}
                                             <span className={styles.codeFlag}>-sSL</span>{' '}
                                             <span className={styles.codeUrl}>https://yashvs.is-a.dev/install-linux.sh</span>{' '}
                                             <span className={styles.codePipe}>|</span>{' '}
                                             <span className={styles.codeCmd}>bash</span>
-                                        </>
-                                    )}
-                                </code>
-                            </div>
-                        </div>
+                                        </code>
+                                    </div>
+                                </div>
 
-                        <p className={styles.hint}>
-                            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" className={styles.hintIcon}>
-                                <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z" />
-                            </svg>
-                            {currentConfig.hint}
-                        </p>
+                                <p className={styles.hint}>
+                                    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" className={styles.hintIcon}>
+                                        <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z" />
+                                    </svg>
+                                    {currentConfig.hint}
+                                </p>
+                            </>
+                        )}
                     </section>
-
-                    {/* Direct Download Section (Linux only) */}
-                    {platform === 'Linux' && (
-                        <section className={styles.section}>
-                            <h2 className={styles.sectionTitle}>Direct Download</h2>
-                            <p className={styles.sectionDesc}>
-                                Prefer manual installation? Download the .deb package directly:
-                            </p>
-                            <a
-                                href={DEB_DOWNLOAD_URL}
-                                className={styles.downloadBtn}
-                                download
-                            >
-                                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                                    <path d="M2.75 14A1.75 1.75 0 011 12.25v-2.5a.75.75 0 011.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25v-2.5a.75.75 0 011.5 0v2.5A1.75 1.75 0 0113.25 14H2.75z" />
-                                    <path d="M7.25 7.689V2a.75.75 0 011.5 0v5.689l1.97-1.969a.749.749 0 111.06 1.06l-3.25 3.25a.749.749 0 01-1.06 0L4.22 6.78a.749.749 0 111.06-1.06l1.97 1.969z" />
-                                </svg>
-                                spectre_1.0.0_all.deb
-                            </a>
-                            <p className={styles.downloadHint}>
-                                After downloading, install with: <code>sudo dpkg -i spectre_1.0.0_all.deb</code>
-                            </p>
-                        </section>
-                    )}
 
                 </main>
 
