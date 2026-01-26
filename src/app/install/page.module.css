@@ -503,16 +503,18 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
-    background: var(--color-text);
-    color: var(--color-bg);
+    background: #1a1a1a;
+    color: #fff;
     font-weight: var(--font-semibold);
     font-size: var(--text-sm);
     border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all var(--transition-base);
 }
 
 .comingSoonBtn:hover {
-    background: var(--color-text-secondary);
+    background: #2a2a2a;
+    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
 }
 
