@@ -16,11 +16,12 @@ function Write-Err($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red; exit 
 
 # ASCII Art
 Write-Host ""
-Write-Host "   _____ ____  _________________  ______" -ForegroundColor Cyan
-Write-Host "  / ___// __ \/ ____/ ____/_  __/ __  /" -ForegroundColor Cyan
-Write-Host "  \__ \/ /_/ / __/ / /     / / / /_/ / " -ForegroundColor Cyan
-Write-Host " ___/ / ____/ /___/ /___  / / / _, _/  " -ForegroundColor Cyan
-Write-Host "/____/_/   /_____/\____/ /_/ /_/ |_|   " -ForegroundColor Cyan
+Write-Host "  ███████╗██████╗ ███████╗ ██████╗████████╗██████╗ ███████╗" -ForegroundColor Cyan
+Write-Host "  ██╔════╝██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔════╝" -ForegroundColor Cyan
+Write-Host "  ███████╗██████╔╝█████╗  ██║        ██║   ██████╔╝█████╗  " -ForegroundColor Cyan
+Write-Host "  ╚════██║██╔═══╝ ██╔══╝  ██║        ██║   ██╔══██╗██╔══╝  " -ForegroundColor Cyan
+Write-Host "  ███████║██║     ███████╗╚██████╗   ██║   ██║  ██║███████╗" -ForegroundColor Cyan
+Write-Host "  ╚══════╝╚═╝     ╚══════╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝" -ForegroundColor Cyan
 Write-Host ""
 Write-Info "Installing SPECTRE for Windows"
 
