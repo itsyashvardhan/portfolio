@@ -1,7 +1,3 @@
-![Portfolio Template Banner](public/banner.png)
-
-<div align="center">
-
 # Next.js Portfolio Template
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
