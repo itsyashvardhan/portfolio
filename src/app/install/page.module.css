@@ -512,7 +512,7 @@
 }
 
 .comingSoonBtn:hover {
-    opacity: 0.9;
+    background: var(--color-text-secondary);
     transform: translateY(-1px);
 }
 
