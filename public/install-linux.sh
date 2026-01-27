@@ -5,7 +5,7 @@
 set -e
 
 REPO="itsyashvardhan/spectre"
-DEB_URL="https://github.com/itsyashvardhan/spectre/releases/download/untagged-8f29264082a7b427b4e8/spectre_1.0.0_all.deb"
+DEB_URL="https://github.com/itsyashvardhan/spectre/releases/download/1.0.1/spectre_1.0.1_all.deb"
 
 # Colors
 GREEN='\033[0;32m'

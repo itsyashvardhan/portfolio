@@ -259,6 +259,39 @@ export default function InstallPage() {
                                     </svg>
                                     {currentConfig.hint}
                                 </p>
+
+                                {/* Direct Download Section (Linux only) */}
+                                {platform === 'Linux' && (
+                                    <section className={styles.directDownload}>
+                                        <h3 className={styles.downloadTitle}>Direct Download</h3>
+                                        <p className={styles.downloadDesc}>
+                                            Prefer to install manually? Download the Debian package directly.
+                                        </p>
+                                        <div className={styles.downloadActions}>
+                                            <a
+                                                href="https://github.com/itsyashvardhan/spectre/releases/download/1.0.1/spectre_1.0.1_all.deb"
+                                                className={styles.downloadBtn}
+                                            >
+                                                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                                                </svg>
+                                                Download .deb
+                                            </a>
+                                            <div className={styles.downloadMeta}>
+                                                <div className={styles.metaRow}>
+                                                    <span>v1.0.1</span>
+                                                    <span className={styles.metaSep}>·</span>
+                                                    <span>spectre_1.0.1_all.deb</span>
+                                                </div>
+                                                <div className={styles.checksumRow}>
+                                                    <span className={styles.checksumLabel}>SHA256:</span>
+                                                    <code className={styles.checksumValue}>c0ddf315edc421595bf57ef735608814ba3fd7ee4e56d8bce7f1799725455077</code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
                             </>
                         )}
                     </section>
@@ -298,7 +331,7 @@ export default function InstallPage() {
                             </div>
                             <div className={styles.installItem}>
                                 <span className={styles.installLabel}>Version</span>
-                                <code className={styles.installValue}>1.0.0</code>
+                                <code className={styles.installValue}>1.0.1</code>
                             </div>
                         </div>
                     </div>

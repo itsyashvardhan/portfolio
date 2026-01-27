@@ -387,7 +387,32 @@
     flex-shrink: 0;
 }
 
-/* ===== Download Button ===== */
+/* ===== Direct Download ===== */
+.directDownload {
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
+    border-top: 1px dashed var(--color-border);
+}
+
+.downloadTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.downloadDesc {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-6) 0;
+}
+
+.downloadActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
 .downloadBtn {
     display: inline-flex;
     align-items: center;
@@ -399,17 +424,58 @@
     font-size: var(--text-sm);
     border-radius: 10px;
     transition: all var(--transition-base);
+    text-decoration: none;
 }
 
 .downloadBtn:hover {
     opacity: 0.9;
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--color-accent-rgb), 0.3);
 }
 
-.downloadHint {
+.downloadMeta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.metaRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-size: var(--text-sm);
     color: var(--color-text-tertiary);
-    margin-top: var(--space-3);
+    font-family: var(--font-dot-matrix), monospace;
+}
+
+.metaSep {
+    opacity: 0.5;
+}
+
+.checksumRow {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+}
+
+.checksumLabel {
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+
+.checksumValue {
+    font-family: var(--font-dot-matrix), monospace;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+    padding: 2px 8px;
+    border-radius: 4px;
+    word-break: break-all;
+    max-width: 400px;
 }
 
 .downloadHint code {
