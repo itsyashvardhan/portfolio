@@ -138,7 +138,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${inter.variable} ${dotMatrix.variable}`}>
+    <html lang="en" className={`${inter.variable} ${dotMatrix.variable}`} suppressHydrationWarning>
       <head>
         {/* Preconnect to Supabase for faster data fetching */}
         {supabaseUrl && (
@@ -153,7 +153,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         {children}
         <ConsoleMessage />
         <Analytics />

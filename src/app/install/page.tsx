@@ -61,7 +61,7 @@ export default function InstallPage() {
             icon: <AppleIcon />,
             title: 'macOS',
             subtitle: 'Intel & Apple Silicon',
-            installCommand: 'curl -sSL https://yashvs.is-a.dev/install-macos.sh | bash',
+            installCommand: 'curl -fsSL https://yashvs.dev/spectral/install.sh | bash',
             commandLabel: 'Terminal',
             hint: 'Open Terminal and paste the command above',
             requirements: [
@@ -75,7 +75,7 @@ export default function InstallPage() {
             icon: <LinuxIcon />,
             title: 'Linux',
             subtitle: 'Debian/Ubuntu & more',
-            installCommand: 'curl -sSL https://yashvs.is-a.dev/install-linux.sh | bash',
+            installCommand: 'curl -fsSL https://yashvs.dev/spectral/install.sh | bash',
             commandLabel: 'Terminal',
             hint: 'Open your terminal and paste the command above',
             requirements: [
@@ -88,7 +88,7 @@ export default function InstallPage() {
             icon: <WindowsIcon />,
             title: 'Windows',
             subtitle: 'Windows 10/11',
-            installCommand: 'irm https://yashvs.is-a.dev/install-windows.ps1 | iex',
+            installCommand: 'irm https://yashvs.dev/spectral/install.sh | iex',
             commandLabel: 'PowerShell',
             hint: 'Run PowerShell as Administrator and paste the command above',
             requirements: [
@@ -117,14 +117,14 @@ export default function InstallPage() {
                 <aside className={styles.sidebar}>
                     <div className={styles.sidebarHeader}>
                         <Image
-                            src="/spectre-logo.png"
-                            alt="Spectre"
+                            src="/spectral-logo.png"
+                            alt="Spectral"
                             width={128}
                             height={128}
                             className={styles.sidebarLogo}
                         />
                     </div>
-                    <h1 className={styles.sidebarTitle}>Spectre</h1>
+                    <h1 className={styles.sidebarTitle}>Spectral</h1>
                     <nav className={styles.platformNav}>
                         <span className={styles.navLabel}>Platforms</span>
                         {(['macOS', 'Linux', 'Windows'] as const).map((p) => (
@@ -146,7 +146,7 @@ export default function InstallPage() {
 
                     <div className={styles.sidebarFooter}>
                         <a
-                            href="https://github.com/itsyashvardhan/spectre/releases"
+                            href="https://github.com/itsyashvardhan/spectral-tui/releases"
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.releasesLink}
@@ -170,7 +170,7 @@ export default function InstallPage() {
                             <span className={styles.breadcrumbCurrent}>{currentConfig.title}</span>
                         </div>
                         <h1 className={styles.pageTitle}>
-                            Install Spectre on {currentConfig.title}
+                            Install Spectral on {currentConfig.title}
                         </h1>
                         <p className={styles.pageSubtitle}>
                             Precision intelligence for your workspace. One command to get started.
@@ -191,11 +191,11 @@ export default function InstallPage() {
                                 <h3 className={styles.comingSoonTitle}>Coming Soon</h3>
                                 <p className={styles.comingSoonText}>
                                     {currentConfig.title} support is currently under development.
-                                    We&apos;re working hard to bring Spectre to your platform.
+                                    We&apos;re working hard to bring Spectral to your platform.
                                 </p>
                                 <div className={styles.comingSoonActions}>
                                     <a
-                                        href="https://github.com/itsyashvardhan/spectre"
+                                        href="https://github.com/itsyashvardhan/spectral-tui"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className={styles.comingSoonBtn}
@@ -246,7 +246,7 @@ export default function InstallPage() {
                                             <span className={styles.codeDim}>$</span>{' '}
                                             <span className={styles.codeCmd}>curl</span>{' '}
                                             <span className={styles.codeFlag}>-sSL</span>{' '}
-                                            <span className={styles.codeUrl}>https://yashvs.is-a.dev/install-linux.sh</span>{' '}
+                                            <span className={styles.codeUrl}>https://yashvs.dev/spectral/install.sh</span>{' '}
                                             <span className={styles.codePipe}>|</span>{' '}
                                             <span className={styles.codeCmd}>bash</span>
                                         </code>
@@ -269,7 +269,7 @@ export default function InstallPage() {
                                         </p>
                                         <div className={styles.downloadActions}>
                                             <a
-                                                href="https://github.com/itsyashvardhan/spectre/releases/download/1.0.1/spectre_1.0.1_all.deb"
+                                                href="https://github.com/itsyashvardhan/spectral-tui/releases/download/v1.0.2/spectral_1.0.2_all.deb"
                                                 className={styles.downloadBtn}
                                             >
                                                 <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
@@ -280,13 +280,13 @@ export default function InstallPage() {
                                             </a>
                                             <div className={styles.downloadMeta}>
                                                 <div className={styles.metaRow}>
-                                                    <span>v1.0.1</span>
+                                                    <span>v1.0.2</span>
                                                     <span className={styles.metaSep}>·</span>
-                                                    <span>spectre_1.0.1_all.deb</span>
+                                                    <span>spectral_1.0.2_all.deb</span>
                                                 </div>
                                                 <div className={styles.checksumRow}>
                                                     <span className={styles.checksumLabel}>SHA256:</span>
-                                                    <code className={styles.checksumValue}>c0ddf315edc421595bf57ef735608814ba3fd7ee4e56d8bce7f1799725455077</code>
+                                                    <code className={styles.checksumValue}>5903b7387502f0a9a8bec5cfcd25fdea7a91a2c71f030806a27a7a2a9d1fbfa8</code>
                                                 </div>
                                             </div>
                                         </div>
@@ -321,17 +321,17 @@ export default function InstallPage() {
                         <div className={styles.installDetails}>
                             <div className={styles.installItem}>
                                 <span className={styles.installLabel}>Binary</span>
-                                <code className={styles.installValue}>spectre</code>
+                                <code className={styles.installValue}>spectral</code>
                             </div>
                             <div className={styles.installItem}>
                                 <span className={styles.installLabel}>Location</span>
                                 <code className={styles.installValue}>
-                                    {platform === 'Windows' ? '%LOCALAPPDATA%\\Spectre' : '/usr/local/bin'}
+                                    {platform === 'Windows' ? '%LOCALAPPDATA%\\Spectral' : '/usr/local/bin'}
                                 </code>
                             </div>
                             <div className={styles.installItem}>
                                 <span className={styles.installLabel}>Version</span>
-                                <code className={styles.installValue}>1.0.1</code>
+                                <code className={styles.installValue}>1.0.2</code>
                             </div>
                         </div>
                     </div>
