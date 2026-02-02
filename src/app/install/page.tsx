@@ -269,7 +269,7 @@ export default function InstallPage() {
                                         </p>
                                         <div className={styles.downloadActions}>
                                             <a
-                                                href="https://github.com/itsyashvardhan/spectral-tui/releases/download/v1.0.2/spectral_1.0.2_all.deb"
+                                                href="https://github.com/itsyashvardhan/spectral-tui/releases/download/v1.0.2/spectral-tui_1.0.2_all.deb"
                                                 className={styles.downloadBtn}
                                             >
                                                 <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
@@ -282,7 +282,7 @@ export default function InstallPage() {
                                                 <div className={styles.metaRow}>
                                                     <span>v1.0.2</span>
                                                     <span className={styles.metaSep}>·</span>
-                                                    <span>spectral_1.0.2_all.deb</span>
+                                                    <span>spectral-tui_1.0.2_all.deb</span>
                                                 </div>
                                                 <div className={styles.checksumRow}>
                                                     <span className={styles.checksumLabel}>SHA256:</span>

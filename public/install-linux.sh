@@ -5,7 +5,7 @@
 set -e
 
 REPO="itsyashvardhan/spectral-tui"
-DEB_URL="https://github.com/itsyashvardhan/spectral-tui/releases/download/v1.0.2/spectral_1.0.2_all.deb"
+DEB_URL="https://github.com/itsyashvardhan/spectral-tui/releases/download/v1.0.2/spectral-tui_1.0.2_all.deb"
 
 # Colors
 GREEN='\033[0;32m'
