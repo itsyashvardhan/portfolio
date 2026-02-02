@@ -61,7 +61,7 @@ export default function InstallPage() {
             icon: <AppleIcon />,
             title: 'macOS',
             subtitle: 'Intel & Apple Silicon',
-            installCommand: 'curl -fsSL https://yashvs.dev/spectral/install.sh | bash',
+            installCommand: 'curl -fsSL https://yashvardhan.is-a.dev/spectral/install.sh | bash',
             commandLabel: 'Terminal',
             hint: 'Open Terminal and paste the command above',
             requirements: [
@@ -75,7 +75,7 @@ export default function InstallPage() {
             icon: <LinuxIcon />,
             title: 'Linux',
             subtitle: 'Debian/Ubuntu & more',
-            installCommand: 'curl -fsSL https://yashvs.dev/spectral/install.sh | bash',
+            installCommand: 'curl -fsSL https://yashvardhan.is-a.dev/spectral/install.sh | bash',
             commandLabel: 'Terminal',
             hint: 'Open your terminal and paste the command above',
             requirements: [
@@ -88,7 +88,7 @@ export default function InstallPage() {
             icon: <WindowsIcon />,
             title: 'Windows',
             subtitle: 'Windows 10/11',
-            installCommand: 'irm https://yashvs.dev/spectral/install.sh | iex',
+            installCommand: 'irm https://yashvardhan.is-a.dev/install-windows.ps1 | iex',
             commandLabel: 'PowerShell',
             hint: 'Run PowerShell as Administrator and paste the command above',
             requirements: [
@@ -246,7 +246,7 @@ export default function InstallPage() {
                                             <span className={styles.codeDim}>$</span>{' '}
                                             <span className={styles.codeCmd}>curl</span>{' '}
                                             <span className={styles.codeFlag}>-sSL</span>{' '}
-                                            <span className={styles.codeUrl}>https://yashvs.dev/spectral/install.sh</span>{' '}
+                                            <span className={styles.codeUrl}>https://yashvardhan.is-a.dev/spectral/install.sh</span>{' '}
                                             <span className={styles.codePipe}>|</span>{' '}
                                             <span className={styles.codeCmd}>bash</span>
                                         </code>
