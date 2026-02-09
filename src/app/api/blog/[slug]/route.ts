@@ -5,17 +5,25 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { slug } = await params
-    const article = await getBlogBySlug(slug)
+    try {
+        const { slug } = await params
+        const article = await getBlogBySlug(slug)
 
-    if (!article) {
+        if (!article) {
+            return NextResponse.json(
+                { error: 'Article not found' },
+                { status: 404 }
+            )
+        }
+
+        return NextResponse.json({ data: article })
+    } catch (error) {
+        console.error('Blog slug API error:', error)
         return NextResponse.json(
-            { error: 'Article not found' },
-            { status: 404 }
+            { error: 'Failed to fetch article' },
+            { status: 500 }
         )
     }
-
-    return NextResponse.json({ data: article })
 }
 
 // Example response:

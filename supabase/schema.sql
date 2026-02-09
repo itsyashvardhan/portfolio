@@ -1,6 +1,5 @@
--- Supabase Full Portfolio Schema Migration
--- Standardized for lowercase table names
--- Run this in your Supabase SQL Editor
+-- Neon DB (PostgreSQL 17) Full Portfolio Schema
+-- Run this in your Neon SQL Editor or via psql
 
 -- ============================================
 -- 0. UTILITIES
@@ -28,6 +27,8 @@ CREATE TABLE IF NOT EXISTS blog (
     tags TEXT[] DEFAULT '{}',
     read_time INTEGER DEFAULT 5,
     status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+    seo_title TEXT,
+    seo_description TEXT,
     published_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS works (
     tech_stack TEXT[] DEFAULT '{}',
     repo_url TEXT,
     demo_url TEXT,
+    demo_label TEXT,
     project_status TEXT DEFAULT 'active' CHECK (project_status IN ('active', 'archived', 'in-progress')),
     featured BOOLEAN DEFAULT false,
     status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
@@ -154,83 +156,37 @@ INSERT INTO social_links (platform, url, display_name, display_order) VALUES
 ON CONFLICT DO NOTHING;
 
 -- ============================================
--- 4. ADMIN & SECURITY
+-- 5. ADMIN USERS
 -- ============================================
 
-CREATE TABLE IF NOT EXISTS admin_emails (
-    email TEXT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS admin_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    totp_secret TEXT,
+    totp_enabled BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Note: Users must manually insert their email into admin_emails table via SQL
--- INSERT INTO admin_emails (email) VALUES ('your-email@example.com');
-
--- Enable RLS
-ALTER TABLE blog ENABLE ROW LEVEL SECURITY;
-ALTER TABLE works ENABLE ROW LEVEL SECURITY;
-ALTER TABLE profile ENABLE ROW LEVEL SECURITY;
-ALTER TABLE experience ENABLE ROW LEVEL SECURITY;
-ALTER TABLE skills ENABLE ROW LEVEL SECURITY;
-ALTER TABLE education ENABLE ROW LEVEL SECURITY;
-ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE social_links ENABLE ROW LEVEL SECURITY;
-ALTER TABLE admin_emails ENABLE ROW LEVEL SECURITY;
-
--- Public Read Policies
-DROP POLICY IF EXISTS "Public can read blog" ON blog;
-CREATE POLICY "Public can read blog" ON blog FOR SELECT USING (status = 'published');
-
-DROP POLICY IF EXISTS "Public can read works" ON works;
-CREATE POLICY "Public can read works" ON works FOR SELECT USING (status = 'published');
-
-DROP POLICY IF EXISTS "Public can read profile" ON profile;
-CREATE POLICY "Public can read profile" ON profile FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public can read experience" ON experience;
-CREATE POLICY "Public can read experience" ON experience FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public can read skills" ON skills;
-CREATE POLICY "Public can read skills" ON skills FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public can read education" ON education;
-CREATE POLICY "Public can read education" ON education FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public can read achievements" ON achievements;
-CREATE POLICY "Public can read achievements" ON achievements FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public can read social_links" ON social_links;
-CREATE POLICY "Public can read social_links" ON social_links FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public can read admin_emails" ON admin_emails;
-CREATE POLICY "Public read admin_emails" ON admin_emails FOR SELECT USING (true);
-
--- Admin Manage Policies
-DROP POLICY IF EXISTS "Admin manage all blog" ON blog;
-CREATE POLICY "Admin manage all blog" ON blog FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage all works" ON works;
-CREATE POLICY "Admin manage all works" ON works FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage profile" ON profile;
-CREATE POLICY "Admin manage profile" ON profile FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage experience" ON experience;
-CREATE POLICY "Admin manage experience" ON experience FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage skills" ON skills;
-CREATE POLICY "Admin manage skills" ON skills FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage education" ON education;
-CREATE POLICY "Admin manage education" ON education FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage achievements" ON achievements;
-CREATE POLICY "Admin manage achievements" ON achievements FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
-
-DROP POLICY IF EXISTS "Admin manage social_links" ON social_links;
-CREATE POLICY "Admin manage social_links" ON social_links FOR ALL USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_emails));
+-- To create an admin user, run:
+-- INSERT INTO admin_users (email, password_hash)
+-- VALUES ('your-email@example.com', '<bcrypt-hash>');
+-- Generate a bcrypt hash with: npx bcryptjs hash "your-password"
 
 -- ============================================
--- 5. INDEXES
+-- 6. SETTINGS
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key TEXT UNIQUE NOT NULL,
+    value TEXT NOT NULL DEFAULT '',
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- 7. INDEXES
 -- ============================================
 
 CREATE INDEX IF NOT EXISTS idx_blog_published_at ON blog(published_at);
@@ -241,9 +197,14 @@ CREATE INDEX IF NOT EXISTS idx_education_display_order ON education(display_orde
 CREATE INDEX IF NOT EXISTS idx_achievements_display_order ON achievements(display_order);
 
 -- ============================================
--- 6. TRIGGERS
+-- 8. TRIGGERS
 -- ============================================
 
+DROP TRIGGER IF EXISTS update_blog_updated_at ON blog;
 CREATE TRIGGER update_blog_updated_at BEFORE UPDATE ON blog FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS update_works_updated_at ON works;
 CREATE TRIGGER update_works_updated_at BEFORE UPDATE ON works FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS update_profile_updated_at ON profile;
 CREATE TRIGGER update_profile_updated_at BEFORE UPDATE ON profile FOR EACH ROW EXECUTE FUNCTION update_updated_at();

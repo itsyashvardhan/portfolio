@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import styles from './page.module.css'
 
 interface Experience {
@@ -26,18 +26,13 @@ export default function AdminExperiencePage() {
         highlights: '',
         display_order: 0,
     })
-    const supabase = createClient()
 
     useEffect(() => {
         fetchExperiences()
     }, [])
 
     const fetchExperiences = async () => {
-        const { data } = await supabase
-            .from('experience')
-            .select('*')
-            .order('display_order', { ascending: true })
-
+        const data = await adminFetch('experience')
         if (data) setExperiences(data)
         setLoading(false)
     }
@@ -79,14 +74,9 @@ export default function AdminExperiencePage() {
         }
 
         if (editingId) {
-            await supabase
-                .from('experience')
-                .update(payload)
-                .eq('id', editingId)
+            await adminAction('experience', 'update', payload, editingId)
         } else {
-            await supabase
-                .from('experience')
-                .insert([payload])
+            await adminAction('experience', 'insert', payload)
         }
 
         resetForm()
@@ -95,7 +85,7 @@ export default function AdminExperiencePage() {
 
     const deleteExperience = async (id: string) => {
         if (!confirm('Are you sure you want to delete this?')) return
-        await supabase.from('experience').delete().eq('id', id)
+        await adminAction('experience', 'delete', undefined, id)
         fetchExperiences()
     }
 

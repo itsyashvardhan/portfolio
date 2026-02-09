@@ -132,7 +132,7 @@ Under the hood, the portfolio is built to be maintainable by someone who doesn't
 ### Stack
 
 - **Next.js 15** (App Router) — Server components by default. Pages are rendered at build time with ISR (Incremental Static Regeneration) for freshness.
-- **Supabase** — PostgreSQL for all content. Blog posts, projects, experience, skills, education, achievements, and social links are all database-driven.
+- **Neon DB** — PostgreSQL for all content. Blog posts, projects, experience, skills, education, achievements, and social links are all database-driven.
 - **CSS Modules** — No utility classes. Each component has co-located styles with full access to design tokens defined in \`globals.css\`.
 - **Vercel** — Deploy on push. Analytics included.
 
@@ -219,7 +219,7 @@ If you're building your own portfolio, consider what you're actually optimizing 
 
 ---
 
-*Built with Next.js, Supabase, and a healthy disrespect for trends.*
+*Built with Next.js, Neon DB, and a healthy disrespect for trends.*
 `
 }
 

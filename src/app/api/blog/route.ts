@@ -2,14 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBlogList } from '@/lib/data'
 
 export async function GET(request: NextRequest) {
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1', 10)
-    const limit = parseInt(searchParams.get('limit') || '10', 10)
-    const tag = searchParams.get('tag') || undefined
+    try {
+        const { searchParams } = new URL(request.url)
+        const page = parseInt(searchParams.get('page') || '1', 10)
+        const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10), 50)
+        const tag = searchParams.get('tag') || undefined
 
-    const data = await getBlogList({ page, limit, tag })
+        const data = await getBlogList({ page, limit, tag })
 
-    return NextResponse.json(data)
+        return NextResponse.json(data)
+    } catch (error) {
+        console.error('Blog API error:', error)
+        return NextResponse.json(
+            { error: 'Failed to fetch blog data' },
+            { status: 500 }
+        )
+    }
 }
 
 // Example response:

@@ -2,8 +2,16 @@ import { NextResponse } from 'next/server'
 import { getAboutPageData } from '@/lib/data'
 
 export async function GET() {
-    const data = await getAboutPageData()
-    return NextResponse.json(data)
+    try {
+        const data = await getAboutPageData()
+        return NextResponse.json(data)
+    } catch (error) {
+        console.error('About API error:', error)
+        return NextResponse.json(
+            { error: 'Failed to fetch about data' },
+            { status: 500 }
+        )
+    }
 }
 
 // Example response:

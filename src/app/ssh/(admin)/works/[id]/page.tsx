@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { adminAction } from '@/lib/admin-api'
 import styles from '../new/page.module.css'
 
 export default function EditWorkPage() {
     const router = useRouter()
     const params = useParams()
     const id = params.id as string
-    const supabase = createClient()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -38,47 +37,44 @@ export default function EditWorkPage() {
         if (!id) return
         let isMounted = true
         const loadWork = async () => {
-            const { data, error } = await supabase
-                .from('works')
-                .select('*')
-                .eq('id', id)
-                .single()
+            try {
+                const result = await adminAction('works', 'get_by_id', undefined, id)
 
-            if (!isMounted) return
+                if (!isMounted) return
 
-            if (error) {
-                alert('Error fetching work: ' + error.message)
+                const data = result.data
+                if (data) {
+                    setFormData({
+                        title: data.title || '',
+                        slug: data.slug || '',
+                        role: data.role || '',
+                        description: data.description || '',
+                        problem: data.problem || '',
+                        constraints: data.constraints || '',
+                        decisions: data.decisions || '',
+                        tech_context: data.tech_context || '',
+                        outcome: data.outcome || '',
+                        body: data.body || '',
+                        tech_stack: data.tech_stack?.join(', ') || '',
+                        repo_url: data.repo_url || '',
+                        demo_url: data.demo_url || '',
+                        demo_label: data.demo_label || '',
+                        project_status: data.project_status || 'active',
+                        featured: data.featured || false,
+                        status: data.status || 'draft',
+                        display_order: data.display_order || 0,
+                    })
+                }
+            } catch (error) {
+                alert('Error fetching work')
                 router.push('/ssh/works')
                 return
-            }
-
-            if (data) {
-                setFormData({
-                    title: data.title || '',
-                    slug: data.slug || '',
-                    role: data.role || '',
-                    description: data.description || '',
-                    problem: data.problem || '',
-                    constraints: data.constraints || '',
-                    decisions: data.decisions || '',
-                    tech_context: data.tech_context || '',
-                    outcome: data.outcome || '',
-                    body: data.body || '',
-                    tech_stack: data.tech_stack?.join(', ') || '',
-                    repo_url: data.repo_url || '',
-                    demo_url: data.demo_url || '',
-                    demo_label: data.demo_label || '',
-                    project_status: data.project_status || 'active',
-                    featured: data.featured || false,
-                    status: data.status || 'draft',
-                    display_order: data.display_order || 0,
-                })
             }
             setLoading(false)
         }
         loadWork()
         return () => { isMounted = false }
-    }, [id, router, supabase])
+    }, [id, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -93,16 +89,12 @@ export default function EditWorkPage() {
             description: formData.description || null,
         }
 
-        const { error } = await supabase
-            .from('works')
-            .update(dataToSave)
-            .eq('id', id)
-
-        if (error) {
-            alert('Error updating work: ' + error.message)
-            setSaving(false)
-        } else {
+        try {
+            await adminAction('works', 'update', dataToSave, id)
             router.push('/ssh/works')
+        } catch (error) {
+            alert('Error updating work')
+            setSaving(false)
         }
     }
 
@@ -176,7 +168,7 @@ export default function EditWorkPage() {
                             value={formData.tech_stack}
                             onChange={(e) => setFormData({ ...formData, tech_stack: e.target.value })}
                             className={styles.input}
-                            placeholder="Next.js, TypeScript, Supabase"
+                            placeholder="Next.js, TypeScript, PostgreSQL"
                         />
                     </div>
                     <div className={styles.field}>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import styles from '../experience/page.module.css'
 
 interface Achievement {
@@ -26,18 +26,13 @@ export default function AdminAchievementsPage() {
         icon: '🏆',
         display_order: 0,
     })
-    const supabase = createClient()
 
     useEffect(() => {
         fetchAchievements()
     }, [])
 
     const fetchAchievements = async () => {
-        const { data } = await supabase
-            .from('achievements')
-            .select('*')
-            .order('display_order', { ascending: true })
-
+        const data = await adminFetch('achievements')
         if (data) setAchievements(data)
         setLoading(false)
     }
@@ -77,14 +72,9 @@ export default function AdminAchievementsPage() {
         }
 
         if (editingId) {
-            await supabase
-                .from('achievements')
-                .update(payload)
-                .eq('id', editingId)
+            await adminAction('achievements', 'update', payload, editingId)
         } else {
-            await supabase
-                .from('achievements')
-                .insert([payload])
+            await adminAction('achievements', 'insert', payload)
         }
 
         resetForm()
@@ -93,7 +83,7 @@ export default function AdminAchievementsPage() {
 
     const deleteAchievement = async (id: string) => {
         if (!confirm('Are you sure?')) return
-        await supabase.from('achievements').delete().eq('id', id)
+        await adminAction('achievements', 'delete', undefined, id)
         fetchAchievements()
     }
 

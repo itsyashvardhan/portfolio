@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import styles from '../experience/page.module.css'
 
 interface Education {
@@ -28,18 +28,13 @@ export default function AdminEducationPage() {
         description: '',
         display_order: 0,
     })
-    const supabase = createClient()
 
     useEffect(() => {
         fetchEducation()
     }, [])
 
     const fetchEducation = async () => {
-        const { data } = await supabase
-            .from('education')
-            .select('*')
-            .order('display_order', { ascending: true })
-
+        const data = await adminFetch('education')
         if (data) setEducation(data)
         setLoading(false)
     }
@@ -80,14 +75,9 @@ export default function AdminEducationPage() {
         }
 
         if (editingId) {
-            await supabase
-                .from('education')
-                .update(payload)
-                .eq('id', editingId)
+            await adminAction('education', 'update', payload, editingId)
         } else {
-            await supabase
-                .from('education')
-                .insert([payload])
+            await adminAction('education', 'insert', payload)
         }
 
         resetForm()
@@ -96,7 +86,7 @@ export default function AdminEducationPage() {
 
     const deleteEducation = async (id: string) => {
         if (!confirm('Are you sure?')) return
-        await supabase.from('education').delete().eq('id', id)
+        await adminAction('education', 'delete', undefined, id)
         fetchEducation()
     }
 

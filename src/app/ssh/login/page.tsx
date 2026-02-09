@@ -1,53 +1,44 @@
 'use client'
 
 import React, { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
-// Admin email from environment variable
-const ADMIN_EMAIL = process.env.ADMIN_EMAILS?.split(',')[0]?.trim() || 'admin@example.com'
-
 export default function LoginPage() {
+    const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
-    const [sent, setSent] = useState(false)
     const [error, setError] = useState('')
-    const supabase = createClient()
+    const router = useRouter()
 
-    const handleMagicLink = async () => {
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault()
         setLoading(true)
         setError('')
 
-        const { error: loginError } = await supabase.auth.signInWithOtp({
-            email: ADMIN_EMAIL,
-            options: {
-                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/auth/callback`,
-            }
-        })
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            })
 
-        if (loginError) {
-            setError(loginError.message)
-            setLoading(false)
-        } else {
-            setSent(true)
+            const data = await res.json()
+
+            if (!res.ok) {
+                setError(data.error || 'Login failed')
+                setLoading(false)
+                return
+            }
+
+            if (data.needsMfa) {
+                router.push('/verify')
+            } else {
+                router.push('/ssh')
+            }
+        } catch {
+            setError('Network error. Please try again.')
             setLoading(false)
         }
-    }
-
-    if (sent) {
-        return (
-            <div className={styles.page}>
-                <div className={styles.card}>
-                    <div className={styles.checkmark}>✓</div>
-                    <h1 className={styles.title}>Check your email</h1>
-                    <p className={styles.subtitle}>
-                        Magic login sent<br />
-                    </p>
-                    <p className={styles.note}>
-                        Click the link in the email to sign in.
-                    </p>
-                </div>
-            </div>
-        )
     }
 
     return (
@@ -58,17 +49,24 @@ export default function LoginPage() {
 
                 {error && <div className={styles.error}>{error}</div>}
 
-                <button
-                    onClick={handleMagicLink}
-                    disabled={loading}
-                    className={styles.submitBtn}
-                >
-                    {loading ? 'Sending...' : 'Send Magic Link'}
-                </button>
-
-                <p className={styles.note}>
-                    A login link will be sent to your email.
-                </p>
+                <form onSubmit={handleLogin}>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        autoFocus
+                        className={styles.input}
+                        required
+                    />
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={styles.submitBtn}
+                    >
+                        {loading ? 'Signing in...' : 'Sign In'}
+                    </button>
+                </form>
             </div>
         </div>
     )

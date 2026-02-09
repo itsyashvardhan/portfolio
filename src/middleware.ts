@@ -1,40 +1,62 @@
-import { createServerClient } from '@supabase/ssr'
+import { jwtVerify } from 'jose'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+function getJwtSecret() {
+    const secret = process.env.JWT_SECRET
+    if (!secret) return null
+    return new TextEncoder().encode(secret)
+}
 
-    // Skip middleware if Supabase is not configured
-    if (!supabaseUrl || !supabaseKey) {
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl
+
+    // Allow login page and auth API routes without session
+    if (
+        pathname === '/ssh/login' ||
+        pathname.startsWith('/api/auth/')
+    ) {
         return NextResponse.next()
     }
 
-    let supabaseResponse = NextResponse.next({
-        request,
-    })
+    const secret = getJwtSecret()
+    if (!secret) {
+        return NextResponse.next()
+    }
 
-    const supabase = createServerClient(supabaseUrl, supabaseKey, {
-        cookies: {
-            getAll() {
-                return request.cookies.getAll()
-            },
-            setAll(cookiesToSet) {
-                cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-                supabaseResponse = NextResponse.next({
-                    request,
-                })
-                cookiesToSet.forEach(({ name, value, options }) =>
-                    supabaseResponse.cookies.set(name, value, options)
-                )
-            },
-        },
-    })
+    const token = request.cookies.get('session')?.value
 
-    // Refresh session if it exists
-    await supabase.auth.getUser()
+    // Protected routes: /ssh/*, /verify/*
+    if (pathname.startsWith('/ssh') || pathname.startsWith('/verify')) {
+        if (!token) {
+            return NextResponse.redirect(new URL('/ssh/login', request.url))
+        }
 
-    return supabaseResponse
+        try {
+            const { payload } = await jwtVerify(token, secret)
+
+            // If user has MFA but hasn't verified, redirect to /verify
+            // (except if already on /verify)
+            if (!pathname.startsWith('/verify') && payload.mfaVerified === false) {
+                // Check if user has TOTP enabled — we store this in the JWT
+                // The session is created with mfaVerified=false when TOTP is enabled
+                return NextResponse.redirect(new URL('/verify', request.url))
+            }
+
+            // If on /verify and already MFA verified, redirect to dashboard
+            if (pathname.startsWith('/verify') && payload.mfaVerified === true) {
+                return NextResponse.redirect(new URL('/ssh', request.url))
+            }
+
+            return NextResponse.next()
+        } catch {
+            // Invalid token — clear it and redirect to login
+            const response = NextResponse.redirect(new URL('/ssh/login', request.url))
+            response.cookies.set('session', '', { maxAge: 0, path: '/' })
+            return response
+        }
+    }
+
+    return NextResponse.next()
 }
 
 // Only run middleware on admin routes - public pages don't need auth
@@ -42,7 +64,6 @@ export const config = {
     matcher: [
         '/ssh/:path*',
         '/verify/:path*',
-        '/auth/:path*',
         '/api/auth/:path*',
     ],
 }

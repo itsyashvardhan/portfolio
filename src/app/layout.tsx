@@ -119,8 +119,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
   // JSON-LD structured data for SEO
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -140,13 +138,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${dotMatrix.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preconnect to Supabase for faster data fetching */}
-        {supabaseUrl && (
-          <>
-            <link rel="preconnect" href={supabaseUrl} />
-            <link rel="dns-prefetch" href={supabaseUrl} />
-          </>
-        )}
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"

@@ -1,21 +1,25 @@
 import { MetadataRoute } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
+import { works as worksTable, blog } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
+
+// Force dynamic rendering — sitemap needs DB access
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
-    const supabase = await createClient()
 
     // Fetch all published works
-    const { data: works } = await supabase
-        .from('works')
-        .select('slug, updated_at')
-        .eq('status', 'published')
+    const works = await db
+        .select({ slug: worksTable.slug, updated_at: worksTable.updated_at })
+        .from(worksTable)
+        .where(eq(worksTable.status, 'published'))
 
     // Fetch all published blog posts
-    const { data: blogs } = await supabase
-        .from('Blog')
-        .select('slug, updated_at')
-        .eq('status', 'published')
+    const blogs = await db
+        .select({ slug: blog.slug, updated_at: blog.updated_at })
+        .from(blog)
+        .where(eq(blog.status, 'published'))
 
     // Static pages
     const staticPages: MetadataRoute.Sitemap = [
@@ -46,17 +50,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]
 
     // Dynamic work pages
-    const workPages: MetadataRoute.Sitemap = (works || []).map((work: { slug: string; updated_at: string }) => ({
+    const workPages: MetadataRoute.Sitemap = (works || []).map((work) => ({
         url: `${baseUrl}/works/${work.slug}`,
-        lastModified: new Date(work.updated_at),
+        lastModified: work.updated_at ? new Date(work.updated_at) : new Date(),
         changeFrequency: 'monthly' as const,
         priority: 0.7,
     }))
 
     // Dynamic blog pages
-    const blogPages: MetadataRoute.Sitemap = (blogs || []).map((blog: { slug: string; updated_at: string }) => ({
-        url: `${baseUrl}/blog/${blog.slug}`,
-        lastModified: new Date(blog.updated_at),
+    const blogPages: MetadataRoute.Sitemap = (blogs || []).map((b) => ({
+        url: `${baseUrl}/blog/${b.slug}`,
+        lastModified: b.updated_at ? new Date(b.updated_at) : new Date(),
         changeFrequency: 'monthly' as const,
         priority: 0.7,
     }))

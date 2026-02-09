@@ -5,17 +5,25 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { slug } = await params
-    const work = await getWorkBySlug(slug)
+    try {
+        const { slug } = await params
+        const work = await getWorkBySlug(slug)
 
-    if (!work) {
+        if (!work) {
+            return NextResponse.json(
+                { error: 'Work not found' },
+                { status: 404 }
+            )
+        }
+
+        return NextResponse.json({ data: work })
+    } catch (error) {
+        console.error('Works slug API error:', error)
         return NextResponse.json(
-            { error: 'Work not found' },
-            { status: 404 }
+            { error: 'Failed to fetch work' },
+            { status: 500 }
         )
     }
-
-    return NextResponse.json({ data: work })
 }
 
 // Example response:
@@ -28,11 +36,11 @@ export async function GET(
 //     "problem": "Needed a fast, modern portfolio",
 //     "constraints": "Budget: $0, Time: 1 week",
 //     "decisions": "Chose Next.js for SSR and performance",
-//     "tech_context": "Deployed on Vercel with Supabase backend",
+//     "tech_context": "Deployed on Vercel with Neon DB backend",
 //     "outcome": "Sub-second page loads, 95+ Lighthouse score",
 //     "body": "# Full markdown content...",
 //     "role": "Full Stack Developer",
-//     "tech_stack": ["Next.js", "TypeScript", "Supabase"],
+//     "tech_stack": ["Next.js", "TypeScript", "Neon DB"],
 //     "repo_url": "https://github.com/user/portfolio",
 //     "demo_url": "https://example.com",
 //     "project_status": "active",

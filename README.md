@@ -1,10 +1,10 @@
 # Next.js Portfolio Template
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Neon DB](https://img.shields.io/badge/Neon-PostgreSQL_17-00e599?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-A minimal, high-performance portfolio template designed for developers and designers. Built with **Next.js 16**, **Supabase**, and modern web standards. Features a fully functional **Admin Dashboard** for managing content without code changes.
+A minimal, high-performance portfolio template designed for developers and designers. Built with **Next.js 16**, **Neon DB** (PostgreSQL 17), and modern web standards. Features a fully functional **Admin Dashboard** for managing content without code changes.
 
 [Features](#-features) • [Getting Started](#-getting-started) • [Deployment](#-deployment) • [Customization](#-customization)
 
@@ -16,14 +16,13 @@ A minimal, high-performance portfolio template designed for developers and desig
 
 ### 🎨 Public Interface
 - **Modern & Minimalist**: Clean aesthetics with focus on content and typography.
-- **Dynamic Content**: Works, Writing (Blog), and About pages powered by Supabase.
+- **Dynamic Content**: Works, Writing (Blog), and About pages powered by Neon DB.
 - **SEO Optimized**: Automatic sitemap generation, OpenGraph tags, and JSON-LD structured data.
 - **Performance First**: Built on Next.js App Router with server components and image optimization.
 - **Responsive**: Mobile-first design that adapts seamlessly to all devices.
 
 ### 🛡️ Admin Dashboard (`/ssh`)
-- **Secure Authentication**: Magic Link login via Supabase Auth.
-- **Role-Based Access**: Restricted to whitelisted admin emails.
+- **Secure Authentication**: Email + password login with JWT sessions.
 - **MFA Support**: Optional TOTP (Time-based One-Time Password) for extra security.
 - **Content Management System**:
   - **Works**: CRUD operations for projects with draft/published states.
@@ -33,7 +32,8 @@ A minimal, high-performance portfolio template designed for developers and desig
 ## 🛠 Tech Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **Database**: [Neon DB](https://neon.tech/) (PostgreSQL 17) with [Drizzle ORM](https://orm.drizzle.team/)
+- **Auth**: JWT sessions (jose) + bcrypt passwords + TOTP MFA
 - **Styling**: CSS Modules with Design Tokens
 - **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
 - **Deployment**: [Vercel](https://vercel.com/)
@@ -61,13 +61,13 @@ cp .env.example .env.local
 Fill in your configuration:
 
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# Neon DB — get your connection string from https://console.neon.tech
+DATABASE_URL=postgresql://user:password@ep-xxx.region.aws.neon.tech/dbname?sslmode=require
 
-# Admin Access
-ADMIN_EMAILS=your_email@example.com
+# JWT secret — generate with: openssl rand -base64 32
+JWT_SECRET=your-random-secret-here
+
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 # Branding
 NEXT_PUBLIC_HERO_NAME=Your Name
@@ -86,10 +86,10 @@ NEXT_PUBLIC_OWNER_TWITTER=@yourhandle
 
 ### 3. Database Setup
 
-1. Create a new project on [Supabase](https://supabase.com).
-2. Go to the SQL Editor in your Supabase dashboard.
-3. Run the content of `supabase/schema.sql`.
-4. (Optional) Run `supabase/sample-data.sql` to seed initial data.
+1. Create a project on [Neon](https://console.neon.tech) (PostgreSQL 17).
+2. Copy your connection string into `DATABASE_URL` in `.env.local`.
+3. Push the schema: `npm run db:push`
+4. Create your admin user (see `.env.example` for instructions).
 
 ### 4. Run Locally
 

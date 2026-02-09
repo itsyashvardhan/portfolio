@@ -2,12 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { adminAction } from '@/lib/admin-api'
 import styles from './page.module.css'
 
 export default function NewWorkPage() {
     const router = useRouter()
-    const supabase = createClient()
     const [saving, setSaving] = useState(false)
     const [formData, setFormData] = useState({
         title: '',
@@ -58,15 +57,12 @@ export default function NewWorkPage() {
             description: formData.description || null,
         }
 
-        const { error } = await supabase
-            .from('works')
-            .insert([dataToSave])
-
-        if (error) {
-            alert('Error creating work: ' + error.message)
-            setSaving(false)
-        } else {
+        try {
+            await adminAction('works', 'insert', dataToSave)
             router.push('/ssh/works')
+        } catch (error) {
+            alert('Error creating work')
+            setSaving(false)
         }
     }
 
@@ -138,7 +134,7 @@ export default function NewWorkPage() {
                             value={formData.tech_stack}
                             onChange={(e) => setFormData({ ...formData, tech_stack: e.target.value })}
                             className={styles.input}
-                            placeholder="Next.js, TypeScript, Supabase"
+                            placeholder="Next.js, TypeScript, PostgreSQL"
                         />
                     </div>
                     <div className={styles.field}>

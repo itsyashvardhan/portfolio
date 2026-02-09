@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import styles from './page.module.css'
 
 interface Blog {
@@ -33,15 +33,11 @@ export default function AdminBlogPage() {
         tags: '',
         status: 'draft' as 'draft' | 'published',
     })
-    const supabase = createClient()
 
     useEffect(() => {
         let isMounted = true
         const loadBlogs = async () => {
-            const { data } = await supabase
-                .from('Blog')
-                .select('*')
-                .order('created_at', { ascending: false })
+            const data = await adminFetch('blog')
 
             if (isMounted) {
                 if (data) setBlogs(data)
@@ -50,7 +46,7 @@ export default function AdminBlogPage() {
         }
         loadBlogs()
         return () => { isMounted = false }
-    }, [supabase, refreshKey])
+    }, [refreshKey])
 
     const refresh = () => setRefreshKey(k => k + 1)
 
@@ -113,14 +109,9 @@ export default function AdminBlogPage() {
         }
 
         if (editingId) {
-            await supabase
-                .from('Blog')
-                .update(dataToSave)
-                .eq('id', editingId)
+            await adminAction('blog', 'update', dataToSave, editingId)
         } else {
-            await supabase
-                .from('Blog')
-                .insert([dataToSave])
+            await adminAction('blog', 'insert', dataToSave)
         }
 
         resetForm()
@@ -129,16 +120,13 @@ export default function AdminBlogPage() {
 
     const deleteBlog = async (id: string) => {
         if (!confirm('Are you sure you want to delete this?')) return
-        await supabase.from('Blog').delete().eq('id', id)
+        await adminAction('blog', 'delete', undefined, id)
         refresh()
     }
 
     const toggleStatus = async (Blog: Blog) => {
         const newStatus = Blog.status === 'published' ? 'draft' : 'published'
-        await supabase
-            .from('Blog')
-            .update({ status: newStatus })
-            .eq('id', Blog.id)
+        await adminAction('blog', 'update', { status: newStatus }, Blog.id)
         refresh()
     }
 

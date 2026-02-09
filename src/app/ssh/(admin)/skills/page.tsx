@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import styles from '../experience/page.module.css'
 
 type SkillCategory = 'languages' | 'frameworks' | 'tools' | 'soft-skills' | 'general'
@@ -25,15 +25,11 @@ export default function AdminSkillsPage() {
         proficiency: 80,
         display_order: 0,
     })
-    const supabase = createClient()
 
     useEffect(() => {
         let isMounted = true
         const loadSkills = async () => {
-            const { data } = await supabase
-                .from('skills')
-                .select('*')
-                .order('display_order', { ascending: true })
+            const data = await adminFetch('skills')
 
             if (isMounted) {
                 if (data) setSkills(data)
@@ -42,7 +38,7 @@ export default function AdminSkillsPage() {
         }
         loadSkills()
         return () => { isMounted = false }
-    }, [supabase, refreshKey])
+    }, [refreshKey])
 
     const refresh = () => setRefreshKey(k => k + 1)
 
@@ -70,14 +66,9 @@ export default function AdminSkillsPage() {
         e.preventDefault()
 
         if (editingId) {
-            await supabase
-                .from('skills')
-                .update(formData)
-                .eq('id', editingId)
+            await adminAction('skills', 'update', formData, editingId)
         } else {
-            await supabase
-                .from('skills')
-                .insert([formData])
+            await adminAction('skills', 'insert', formData)
         }
 
         resetForm()
@@ -86,7 +77,7 @@ export default function AdminSkillsPage() {
 
     const deleteSkill = async (id: string) => {
         if (!confirm('Are you sure?')) return
-        await supabase.from('skills').delete().eq('id', id)
+        await adminAction('skills', 'delete', undefined, id)
         refresh()
     }
 

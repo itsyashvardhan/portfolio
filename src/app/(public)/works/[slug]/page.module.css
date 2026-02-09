@@ -7,21 +7,46 @@
 }
 
 .back {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     margin-bottom: var(--space-6);
     transition: color var(--transition-fast);
 }
 
+.back::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: var(--color-text-tertiary);
+    transition: width var(--transition-base);
+}
+
 .back:hover {
     color: var(--color-text);
+}
+
+.back:hover::before {
+    width: 20px;
 }
 
 .header {
     margin-bottom: var(--space-10);
     padding-bottom: var(--space-8);
     border-bottom: 1px solid var(--color-border);
+    position: relative;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 48px;
+    height: 1px;
+    background: var(--color-text-tertiary);
 }
 
 .role {
@@ -62,7 +87,7 @@
     padding: var(--space-5);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
 }
 
 .outcomeSection .content {

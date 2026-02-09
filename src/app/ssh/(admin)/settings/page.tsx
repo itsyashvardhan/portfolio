@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import QRCode from 'qrcode'
 import styles from './page.module.css'
 
@@ -36,31 +36,32 @@ export default function AdminSettingsPage() {
     const [verifyCode, setVerifyCode] = useState('')
     const [showQR, setShowQR] = useState(false)
 
-    const supabase = createClient()
-
     useEffect(() => {
         fetchSettings()
         checkMFAStatus()
     }, [])
 
     const checkMFAStatus = async () => {
-        const { data: factors } = await supabase.auth.mfa.listFactors()
-        if (factors && factors.totp.length > 0) {
-            setIsEnrolled(true)
+        try {
+            const data = await adminFetch('mfa_status')
+            if (data?.isEnrolled) setIsEnrolled(true)
+        } catch {
+            // ignore
         }
     }
 
     const fetchSettings = async () => {
-        const { data } = await supabase
-            .from('settings')
-            .select('*')
-
-        if (data) {
-            const settingsMap: Record<string, string> = {}
-            data.forEach((item: SiteSettings) => {
-                settingsMap[item.key] = item.value
-            })
-            setSettings(settingsMap)
+        try {
+            const data = await adminFetch('settings')
+            if (data) {
+                const settingsMap: Record<string, string> = {}
+                data.forEach((item: SiteSettings) => {
+                    settingsMap[item.key] = item.value
+                })
+                setSettings(settingsMap)
+            }
+        } catch {
+            // ignore
         }
         setLoading(false)
     }
@@ -74,30 +75,13 @@ export default function AdminSettingsPage() {
         setMessage('')
 
         try {
-            for (const setting of DEFAULT_SETTINGS) {
-                const value = settings[setting.key] || ''
+            const payload = DEFAULT_SETTINGS.map(s => ({
+                key: s.key,
+                value: settings[s.key] || '',
+                description: s.description,
+            }))
 
-                const { data: existing } = await supabase
-                    .from('settings')
-                    .select('id')
-                    .eq('key', setting.key)
-                    .single()
-
-                if (existing) {
-                    await supabase
-                        .from('settings')
-                        .update({ value, description: setting.description })
-                        .eq('key', setting.key)
-                } else {
-                    await supabase
-                        .from('settings')
-                        .insert([{
-                            key: setting.key,
-                            value,
-                            description: setting.description,
-                        }])
-                }
-            }
+            await adminAction('settings', 'upsert', payload)
             setMessage('Settings saved successfully!')
         } catch {
             setMessage('Error saving settings.')
@@ -108,49 +92,41 @@ export default function AdminSettingsPage() {
     }
 
     const handleEnrollMFA = async () => {
-        const { data, error } = await supabase.auth.mfa.enroll({
-            factorType: 'totp'
-        })
-        if (error) {
-            setMessage('Error starting enrollment: ' + error.message)
-            return
-        }
+        try {
+            const result = await adminAction('mfa', 'enroll', {})
+            const data = result.data
 
-        const url = await QRCode.toDataURL(data.totp.uri)
-        setMfaData({ ...data, qr_code_url: url })
-        setShowQR(true)
+            const url = await QRCode.toDataURL(data.uri)
+            setMfaData({ ...data, qr_code_url: url })
+            setShowQR(true)
+        } catch (error) {
+            setMessage('Error starting enrollment')
+        }
     }
 
     const handleVerifyMFA = async () => {
-        if (!mfaData?.id) return
-
-        const { data, error } = await supabase.auth.mfa.challengeAndVerify({
-            factorId: mfaData.id,
-            code: verifyCode
-        })
-
-        if (error) {
-            setMessage('Invalid code. Please try again.')
-        } else {
+        try {
+            await adminAction('mfa', 'verify_and_enable', { code: verifyCode })
             setIsEnrolled(true)
             setShowQR(false)
             setMfaData(null)
             setVerifyCode('')
             setMessage('2FA Enabled Successfully!')
+        } catch {
+            setMessage('Invalid code. Please try again.')
         }
     }
 
     const handleUnenrollMFA = async () => {
         if (!confirm('Are you sure you want to disable 2FA? This will make your account less secure.')) return
 
-        const { data: factors } = await supabase.auth.mfa.listFactors()
-        if (!factors) return
-
-        for (const factor of factors.totp) {
-            await supabase.auth.mfa.unenroll({ factorId: factor.id })
+        try {
+            await adminAction('mfa', 'unenroll', {})
+            setIsEnrolled(false)
+            setMessage('2FA Disabled')
+        } catch {
+            setMessage('Error disabling 2FA')
         }
-        setIsEnrolled(false)
-        setMessage('2FA Disabled')
     }
 
     if (loading) return <p>Loading...</p>
@@ -194,7 +170,7 @@ export default function AdminSettingsPage() {
                                         <img src={mfaData.qr_code_url} alt="QR Code" className={styles.qrCode} />
                                     )}
                                     <p style={{ color: '#666', fontSize: '0.9rem' }}>Or enter this code manually:</p>
-                                    <div className={styles.secret}>{mfaData?.totp.secret}</div>
+                                    <div className={styles.secret}>{mfaData?.secret}</div>
 
                                     <div className={styles.verifyRow}>
                                         <input

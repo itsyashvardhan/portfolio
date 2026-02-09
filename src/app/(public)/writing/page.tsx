@@ -1,14 +1,12 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getBlogList } from '@/lib/data'
 import styles from './page.module.css'
 
-export default async function BlogPage() {
-    const supabase = await createClient()
-    const { data: articles } = await supabase
-        .from('Blog')
-        .select('*')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false })
+// Render dynamically — requires DB access
+export const dynamic = 'force-dynamic'
+
+export default async function WritingPage() {
+    const { articles } = await getBlogList()
 
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -30,8 +28,8 @@ export default async function BlogPage() {
                     {articles?.length === 0 ? (
                         <p style={{ color: 'var(--color-text-secondary)' }}>No articles published yet.</p>
                     ) : (
-                        articles?.map((article: any) => (
-                            <Link key={article.slug} href={`/Blog/${article.slug}`} className={styles.item}>
+                        articles?.map((article) => (
+                            <Link key={article.slug} href={`/blog/${article.slug}`} className={styles.item}>
                                 <div className={styles.meta}>
                                     <span className={styles.date}>{formatDate(article.created_at)}</span>
                                     <div className={styles.tags}>

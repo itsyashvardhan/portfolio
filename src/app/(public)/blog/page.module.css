@@ -1,27 +1,69 @@
-/* ============================================
-   BLOG PAGE STYLES - Medium-style Cards
-   ============================================ */
-
 .page {
     min-height: 100vh;
     padding-bottom: var(--space-16);
 }
 
-/* Header */
 .header {
     padding: var(--space-16) 0 var(--space-8);
+    position: relative;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        var(--color-border) 30%,
+        var(--color-border) 60%,
+        transparent 90%
+    );
 }
 
 .title {
     font-size: var(--text-4xl);
     font-weight: var(--font-bold);
     margin-bottom: var(--space-4);
+    position: relative;
+}
+
+.title::before {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--space-4));
+    left: 0;
+    width: 48px;
+    height: 1px;
+    background: var(--color-text-tertiary);
 }
 
 .description {
     font-size: var(--text-lg);
     color: var(--color-text-secondary);
     max-width: 600px;
+}
+
+.headerMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.headerMeta::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: var(--color-text-tertiary);
+    flex-shrink: 0;
 }
 
 .filterInfo {
@@ -75,13 +117,29 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     text-decoration: none;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base);
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 0;
+    background: var(--color-text);
+    transition: height var(--transition-slow);
+    z-index: 1;
+    border-radius: 0 0 1px 0;
 }
 
 .card:hover {
     border-color: var(--color-text-tertiary);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover::before {
+    height: 100%;
 }
 
 /* Card Image */
@@ -196,15 +254,17 @@
     color: var(--color-text-tertiary);
 }
 
-/* Article Detail Styles */
 .article {
     max-width: 720px;
     margin: 0 auto;
     padding: var(--space-8) var(--space-4);
+    position: relative;
 }
 
 .back {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     color: var(--color-text-secondary);
     text-decoration: none;
     font-size: var(--text-sm);
@@ -212,12 +272,36 @@
     transition: color var(--transition-base);
 }
 
+.back::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: var(--color-text-tertiary);
+    transition: width var(--transition-base);
+}
+
 .back:hover {
     color: var(--color-text);
 }
 
+.back:hover::before {
+    width: 20px;
+}
+
 .articleHeader {
     margin-bottom: var(--space-10);
+    position: relative;
+    padding-bottom: var(--space-6);
+}
+
+.articleHeader::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 64px;
+    height: 1px;
+    background: var(--color-text-tertiary);
 }
 
 .articleBanner {
@@ -256,7 +340,6 @@
     color: var(--color-text);
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
     .card {
         flex-direction: column;

@@ -5,9 +5,9 @@ import { MarkdownRenderer } from '@/components/markdown'
 import styles from '../page.module.css'
 import type { Metadata } from 'next'
 
-// Enable dynamic rendering with ISR
+// Enable dynamic rendering
 export const dynamicParams = true
-export const revalidate = 3600 // Cache for 1 hour
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
     params
@@ -55,13 +55,13 @@ export default async function WorkDetailPage({
     return (
         <div className={styles.page}>
             <article className={`container ${styles.projectDetail}`}>
-                <Link href="/works" className={styles.back}>← Back to Works</Link>
+                <Link href="/works" className={styles.back}>Back to Works</Link>
 
                 <header className={styles.projectHeader}>
                     <h1 className={styles.projectTitle}>{work.title}</h1>
 
                     {work.description && (
-                        <p className={styles.cardDesc} style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-lg)' }}>
+                        <p className={styles.cardDesc}>
                             {work.description}
                         </p>
                     )}
@@ -78,7 +78,7 @@ export default async function WorkDetailPage({
 
                     {/* Tech Stack */}
                     {work.tech_stack && work.tech_stack.length > 0 && (
-                        <div className={styles.techStack} style={{ marginTop: 'var(--space-4)' }}>
+                        <div className={styles.techStack}>
                             {work.tech_stack.map((tech: string) => (
                                 <span key={tech} className={styles.tech}>
                                     <span className={styles.techDot} />

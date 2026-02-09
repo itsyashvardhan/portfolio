@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import styles from '../experience/page.module.css'
 
 export default function AdminProfilePage() {
@@ -16,17 +16,13 @@ export default function AdminProfilePage() {
         available_for_work: true,
         resume_url: '',
     })
-    const supabase = createClient()
 
     useEffect(() => {
         fetchProfile()
     }, [])
 
     const fetchProfile = async () => {
-        const { data } = await supabase
-            .from('profile')
-            .select('*')
-            .single()
+        const data = await adminFetch('profile')
 
         if (data) {
             setFormData({
@@ -46,18 +42,7 @@ export default function AdminProfilePage() {
         e.preventDefault()
         setSaving(true)
 
-        const { data: existing } = await supabase.from('profile').select('id').single()
-
-        if (existing) {
-            await supabase
-                .from('profile')
-                .update(formData)
-                .eq('id', existing.id)
-        } else {
-            await supabase
-                .from('profile')
-                .insert([formData])
-        }
+        await adminAction('profile', 'upsert', formData)
 
         setSaving(false)
         alert('Profile updated!')

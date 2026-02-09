@@ -5,8 +5,8 @@ import { MarkdownRenderer } from '@/components/markdown'
 import styles from './page.module.css'
 import type { Metadata } from 'next'
 
-// Cache page for 1 hour
-export const revalidate = 3600
+// Render dynamically — requires DB access
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'About',
@@ -47,11 +47,11 @@ export default async function AboutPage() {
                             <p className={styles.role}>{profile?.title || 'Software Engineer'}</p>
 
                             {profile?.location && (
-                                <p className={styles.location}>📍 {profile.location}</p>
+                                <p className={styles.location}>{profile.location}</p>
                             )}
 
                             {profile?.available_for_work && (
-                                <span className={styles.availableBadge}>✓ Open to opportunities</span>
+                                <span className={styles.availableBadge}>Open to opportunities</span>
                             )}
                         </div>
                     </div>

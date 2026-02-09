@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import styles from './page.module.css'
 
 export default function VerifyPage() {
@@ -10,44 +9,30 @@ export default function VerifyPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
-    const supabase = createClient()
-
-    useEffect(() => {
-        const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/ssh/login')
-            }
-        }
-        checkSession()
-    }, [router, supabase.auth])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError('')
 
-        // Get the TOTP factor ID
-        const { data: factors, error: listError } = await supabase.auth.mfa.listFactors()
+        try {
+            const res = await fetch('/api/auth/verify-totp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            })
 
-        if (listError || !factors || factors.totp.length === 0) {
-            setError('No 2FA setup found.')
+            const data = await res.json()
+
+            if (!res.ok) {
+                setError(data.error || 'Verification failed')
+                setLoading(false)
+            } else {
+                router.push('/ssh')
+            }
+        } catch {
+            setError('Network error. Please try again.')
             setLoading(false)
-            return
-        }
-
-        const factorId = factors.totp[0].id
-
-        const { error } = await supabase.auth.mfa.challengeAndVerify({
-            factorId,
-            code
-        })
-
-        if (error) {
-            setError(error.message)
-            setLoading(false)
-        } else {
-            router.push('/ssh') // Redirect to dashboard on success
         }
     }
 
@@ -68,7 +53,7 @@ export default function VerifyPage() {
                         autoFocus
                     />
 
-                    {error && <p style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</p>}
+                    {error && <p className={styles.error}>{error}</p>}
 
                     <button type="submit" className={styles.verifyBtn} disabled={loading || code.length !== 6}>
                         {loading ? 'Verifying...' : 'Verify'}

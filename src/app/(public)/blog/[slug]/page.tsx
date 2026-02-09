@@ -6,9 +6,9 @@ import { MarkdownRenderer } from '@/components/markdown'
 import styles from '../page.module.css'
 import type { Metadata } from 'next'
 
-// Enable dynamic rendering with ISR
+// Enable dynamic rendering
 export const dynamicParams = true
-export const revalidate = 3600 // Cache for 1 hour
+export const dynamic = 'force-dynamic'
 
 // Generate metadata
 export async function generateMetadata({
@@ -65,7 +65,7 @@ export default async function BlogDetailPage({
     return (
         <div className={styles.page}>
             <article className={`container ${styles.article}`}>
-                <Link href="/blog" className={styles.back}>← Back to Blog</Link>
+                <Link href="/blog" className={styles.back}>Back to Blog</Link>
 
                 {/* Banner Image */}
                 {article.banner_image && (

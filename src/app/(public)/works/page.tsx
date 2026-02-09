@@ -3,8 +3,8 @@ import { getWorksList } from '@/lib/data'
 import styles from './page.module.css'
 import type { Metadata } from 'next'
 
-// Cache page for 1 hour
-export const revalidate = 3600
+// Render dynamically — requires DB access
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'Works',
@@ -31,6 +31,11 @@ export default async function WorksPage() {
                     <p className={styles.description}>
                         Selected projects where I owned the outcome. Open source and professional work.
                     </p>
+                    {projects.length > 0 && (
+                        <div className={styles.headerMeta}>
+                            <span>{projects.length} project{projects.length !== 1 ? 's' : ''}</span>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -68,7 +73,7 @@ function ProjectCard({
         <div className={styles.card}>
             {/* Card Header */}
             <div className={styles.cardHeader}>
-                <div className={styles.cardIcon}>◈</div>
+                <span className={styles.cardIcon}>◈</span>
                 <Link href={`/works/${project.slug}`} className={styles.cardName}>
                     {project.title}
                 </Link>

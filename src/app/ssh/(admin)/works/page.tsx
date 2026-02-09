@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { adminFetch, adminAction } from '@/lib/admin-api'
 import type { Work } from '@/lib/types'
 import styles from './page.module.css'
 
@@ -10,15 +10,11 @@ export default function AdminWorksPage() {
     const [works, setWorks] = useState<Work[]>([])
     const [loading, setLoading] = useState(true)
     const [refreshKey, setRefreshKey] = useState(0)
-    const supabase = createClient()
 
     useEffect(() => {
         let isMounted = true
         const loadWorks = async () => {
-            const { data } = await supabase
-                .from('works')
-                .select('*')
-                .order('display_order', { ascending: true })
+            const data = await adminFetch('works')
 
             if (isMounted) {
                 if (data) setWorks(data)
@@ -27,24 +23,19 @@ export default function AdminWorksPage() {
         }
         loadWorks()
         return () => { isMounted = false }
-    }, [supabase, refreshKey])
+    }, [refreshKey])
 
     const refresh = () => setRefreshKey(k => k + 1)
 
     const toggleStatus = async (work: Work) => {
         const newStatus = work.status === 'published' ? 'draft' : 'published'
-        await supabase
-            .from('works')
-            .update({ status: newStatus })
-            .eq('id', work.id)
-
+        await adminAction('works', 'update', { status: newStatus }, work.id)
         refresh()
     }
 
     const deleteWork = async (id: string) => {
         if (!confirm('Are you sure you want to delete this work?')) return
-
-        await supabase.from('works').delete().eq('id', id)
+        await adminAction('works', 'delete', undefined, id)
         refresh()
     }
 

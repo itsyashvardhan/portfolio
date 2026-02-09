@@ -1,9 +1,16 @@
-// ============================================
-// DATA FETCHING UTILITIES
-// Centralized data access layer
-// ============================================
-
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
+import {
+    blog,
+    works,
+    profile,
+    experience,
+    skills,
+    education,
+    achievements,
+    socialLinks,
+    settings,
+} from '@/lib/db/schema'
+import { eq, desc, asc, sql, and, arrayContains } from 'drizzle-orm'
 import type {
     Blog,
     BlogListItem,
@@ -21,95 +28,93 @@ import type {
     WorksPageData,
 } from '@/lib/types'
 
-// ============================================
-// BLOG DATA ACCESS
-// ============================================
-
 export async function getBlogList(options?: {
     page?: number
     limit?: number
     tag?: string
 }): Promise<BlogPageData> {
     const { page = 1, limit = 10, tag } = options || {}
-    const supabase = await createClient()
-
-    let query = supabase
-        .from('blog')
-        .select('slug, title, excerpt, banner_image, tags, read_time, created_at, published_at', { count: 'exact' })
-        .eq('status', 'published')
-        .order('published_at', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false })
-
-    if (tag) {
-        query = query.contains('tags', [tag])
-    }
-
     const offset = (page - 1) * limit
-    query = query.range(offset, offset + limit - 1)
 
-    const { data, count, error } = await query
-
-    if (error) {
-        console.error('Error fetching blog list:', error)
-        return { articles: [], total: 0, page, limit, hasMore: false }
+    const conditions = [eq(blog.status, 'published')]
+    if (tag) {
+        conditions.push(arrayContains(blog.tags, [tag]))
     }
+
+    const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions)
+
+    const [articles, countResult] = await Promise.all([
+        db
+            .select({
+                slug: blog.slug,
+                title: blog.title,
+                excerpt: blog.excerpt,
+                banner_image: blog.banner_image,
+                tags: blog.tags,
+                read_time: blog.read_time,
+                created_at: blog.created_at,
+                published_at: blog.published_at,
+            })
+            .from(blog)
+            .where(whereClause)
+            .orderBy(desc(blog.published_at), desc(blog.created_at))
+            .limit(limit)
+            .offset(offset),
+        db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(blog)
+            .where(whereClause),
+    ])
+
+    const total = countResult[0]?.count || 0
 
     return {
-        articles: (data || []) as BlogListItem[],
-        total: count || 0,
+        articles: articles as BlogListItem[],
+        total,
         page,
         limit,
-        hasMore: (count || 0) > page * limit,
+        hasMore: total > page * limit,
     }
 }
 
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
-    const supabase = await createClient()
+    const [result] = await db
+        .select()
+        .from(blog)
+        .where(and(eq(blog.slug, slug), eq(blog.status, 'published')))
+        .limit(1)
 
-    const { data, error } = await supabase
-        .from('blog')
-        .select('*')
-        .eq('slug', slug)
-        .eq('status', 'published')
-        .single()
-
-    if (error || !data) {
-        return null
-    }
-
-    return data as Blog
+    return (result as Blog) || null
 }
 
 export async function getAllBlogSlugs(): Promise<string[]> {
-    const supabase = await createClient()
+    const result = await db
+        .select({ slug: blog.slug })
+        .from(blog)
+        .where(eq(blog.status, 'published'))
 
-    const { data } = await supabase
-        .from('blog')
-        .select('slug')
-        .eq('status', 'published')
-
-    return (data || []).map((item: { slug: string }) => item.slug)
+    return result.map(item => item.slug)
 }
 
-// ============================================
-// WORKS/PROJECTS DATA ACCESS
-// ============================================
-
 export async function getWorksList(): Promise<WorksPageData> {
-    const supabase = await createClient()
+    const result = await db
+        .select({
+            slug: works.slug,
+            title: works.title,
+            description: works.description,
+            outcome: works.outcome,
+            tech_stack: works.tech_stack,
+            repo_url: works.repo_url,
+            demo_url: works.demo_url,
+            demo_label: works.demo_label,
+            project_status: works.project_status,
+            featured: works.featured,
+        })
+        .from(works)
+        .where(eq(works.status, 'published'))
+        .orderBy(asc(works.display_order))
 
-    const { data, error } = await supabase
-        .from('works')
-        .select('slug, title, description, outcome, tech_stack, repo_url, demo_url, demo_label, project_status, featured')
-        .eq('status', 'published')
-        .order('display_order', { ascending: true })
-
-    if (error) {
-        console.error('Error fetching works:', error)
-        return { projects: [], featured: [] }
-    }
-
-    const projects = (data || []) as WorkListItem[]
+    const projects = result as WorkListItem[]
 
     return {
         projects,
@@ -118,93 +123,85 @@ export async function getWorksList(): Promise<WorksPageData> {
 }
 
 export async function getWorkBySlug(slug: string): Promise<Work | null> {
-    const supabase = await createClient()
+    const [result] = await db
+        .select()
+        .from(works)
+        .where(and(eq(works.slug, slug), eq(works.status, 'published')))
+        .limit(1)
 
-    const { data, error } = await supabase
-        .from('works')
-        .select('*')
-        .eq('slug', slug)
-        .eq('status', 'published')
-        .single()
-
-    if (error || !data) {
-        return null
-    }
-
-    return data as Work
+    return (result as Work) || null
 }
 
 export async function getAllWorkSlugs(): Promise<string[]> {
-    const supabase = await createClient()
+    const result = await db
+        .select({ slug: works.slug })
+        .from(works)
+        .where(eq(works.status, 'published'))
 
-    const { data } = await supabase
-        .from('works')
-        .select('slug')
-        .eq('status', 'published')
-
-    return (data || []).map((item: { slug: string }) => item.slug)
+    return result.map(item => item.slug)
 }
 
-// ============================================
-// ABOUT PAGE DATA ACCESS
-// ============================================
-
 export async function getProfile(): Promise<Profile | null> {
-    const supabase = await createClient()
+    try {
+        const [result] = await db
+            .select()
+            .from(profile)
+            .limit(1)
 
-    const { data, error } = await supabase
-        .from('profile')
-        .select('*')
-        .limit(1)
-        .single()
-
-    if (error) {
-        // Return default profile from env vars if table doesn't exist or is empty
-        const ownerName = process.env.NEXT_PUBLIC_OWNER_NAME || 'Your Name'
-        const ownerTitle = process.env.NEXT_PUBLIC_OWNER_TITLE || 'Software Engineer'
-        return {
-            id: 'default',
-            name: ownerName,
-            title: ownerTitle,
-            bio: 'I design and build systems that ship.',
-            profile_image: null,
-            location: 'Remote',
-            available_for_work: true,
-            resume_url: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        }
+        if (result) return result as Profile
+    } catch (e) {
+        console.error('Error fetching profile:', e)
     }
 
-    return data as Profile
+    // Return default profile from env vars if table doesn't exist or is empty
+    const ownerName = process.env.NEXT_PUBLIC_OWNER_NAME || 'Your Name'
+    const ownerTitle = process.env.NEXT_PUBLIC_OWNER_TITLE || 'Software Engineer'
+    return {
+        id: 'default',
+        name: ownerName,
+        title: ownerTitle,
+        bio: 'I design and build systems that ship.',
+        profile_image: null,
+        location: 'Remote',
+        available_for_work: true,
+        resume_url: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    }
 }
 
 export async function getExperiences(): Promise<Experience[]> {
-    const supabase = await createClient()
+    try {
+        const result = await db
+            .select()
+            .from(experience)
+            .orderBy(asc(experience.display_order))
 
-    const { data, error } = await supabase
-        .from('experience')
-        .select('*')
-        .order('display_order', { ascending: true })
-
-    if (error) {
-        console.error('Error fetching experiences:', error)
+        return result as Experience[]
+    } catch (e) {
+        console.error('Error fetching experiences:', e)
         return []
     }
-
-    return (data || []) as Experience[]
 }
 
 export async function getSkills(): Promise<SkillsByCategory> {
-    const supabase = await createClient()
+    try {
+        const result = await db
+            .select()
+            .from(skills)
+            .orderBy(asc(skills.display_order))
 
-    const { data, error } = await supabase
-        .from('skills')
-        .select('*')
-        .order('display_order', { ascending: true })
+        const allSkills = result as Skill[]
 
-    if (error) {
-        console.error('Error fetching skills:', error)
+        return {
+            languages: allSkills.filter(s => s.category === 'languages'),
+            frameworks: allSkills.filter(s => s.category === 'frameworks'),
+            tools: allSkills.filter(s => s.category === 'tools'),
+            'soft-skills': allSkills.filter(s => s.category === 'soft-skills'),
+            general: allSkills.filter(s => s.category === 'general'),
+        }
+    } catch (e) {
+        console.error('Error fetching skills:', e)
         return {
             languages: [],
             frameworks: [],
@@ -213,59 +210,45 @@ export async function getSkills(): Promise<SkillsByCategory> {
             general: [],
         }
     }
-
-    const skills = (data || []) as Skill[]
-
-    return {
-        languages: skills.filter(s => s.category === 'languages'),
-        frameworks: skills.filter(s => s.category === 'frameworks'),
-        tools: skills.filter(s => s.category === 'tools'),
-        'soft-skills': skills.filter(s => s.category === 'soft-skills'),
-        general: skills.filter(s => s.category === 'general'),
-    }
 }
 
 export async function getEducation(): Promise<Education[]> {
-    const supabase = await createClient()
+    try {
+        const result = await db
+            .select()
+            .from(education)
+            .orderBy(asc(education.display_order))
 
-    const { data, error } = await supabase
-        .from('education')
-        .select('*')
-        .order('display_order', { ascending: true })
-
-    if (error) {
-        console.error('Error fetching education:', error)
+        return result as Education[]
+    } catch (e) {
+        console.error('Error fetching education:', e)
         return []
     }
-
-    return (data || []) as Education[]
 }
 
 export async function getAchievements(): Promise<Achievement[]> {
-    const supabase = await createClient()
+    try {
+        const result = await db
+            .select()
+            .from(achievements)
+            .orderBy(asc(achievements.display_order))
 
-    const { data, error } = await supabase
-        .from('achievements')
-        .select('*')
-        .order('display_order', { ascending: true })
-
-    if (error) {
-        console.error('Error fetching achievements:', error)
+        return result as Achievement[]
+    } catch (e) {
+        console.error('Error fetching achievements:', e)
         return []
     }
-
-    return (data || []) as Achievement[]
 }
 
 export async function getSocialLinks(): Promise<SocialLink[]> {
-    const supabase = await createClient()
+    try {
+        const result = await db
+            .select()
+            .from(socialLinks)
+            .orderBy(asc(socialLinks.display_order))
 
-    const { data, error } = await supabase
-        .from('social_links')
-        .select('*')
-        .order('display_order', { ascending: true })
-
-    if (error) {
+        return result as SocialLink[]
+    } catch (e) {
         // Return defaults from env vars if social_links table doesn't exist
         const ownerEmail = process.env.NEXT_PUBLIC_OWNER_EMAIL || 'email@example.com'
         const ownerGithub = process.env.NEXT_PUBLIC_OWNER_GITHUB || 'https://github.com/username'
@@ -277,13 +260,11 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
             { id: '3', platform: 'linkedin', url: ownerLinkedin, display_name: 'LinkedIn', icon: null, display_order: 3, created_at: '' },
         ]
     }
-
-    return (data || []) as SocialLink[]
 }
 
 // Combined About Page Data
 export async function getAboutPageData(): Promise<AboutPageData> {
-    const [profile, experiences, skills, education, achievements, socialLinks] = await Promise.all([
+    const [profileData, experiences, skillsData, educationData, achievementsData, socialLinksData] = await Promise.all([
         getProfile(),
         getExperiences(),
         getSkills(),
@@ -293,30 +274,24 @@ export async function getAboutPageData(): Promise<AboutPageData> {
     ])
 
     return {
-        profile,
+        profile: profileData,
         experiences,
-        skills,
-        education,
-        achievements,
-        socialLinks,
+        skills: skillsData,
+        education: educationData,
+        achievements: achievementsData,
+        socialLinks: socialLinksData,
     }
 }
 
-// ============================================
-// SETTINGS DATA ACCESS
-// ============================================
-
 export async function getSettings(): Promise<Record<string, string>> {
-    const supabase = await createClient()
+    try {
+        const result = await db
+            .select({ key: settings.key, value: settings.value })
+            .from(settings)
 
-    const { data, error } = await supabase
-        .from('settings')
-        .select('key, value')
-
-    if (error) {
-        console.error('Error fetching settings:', error)
+        return result.reduce((acc: Record<string, string>, curr) => ({ ...acc, [curr.key]: curr.value }), {})
+    } catch (e) {
+        console.error('Error fetching settings:', e)
         return {}
     }
-
-    return (data || []).reduce((acc: Record<string, string>, curr: { key: string; value: string }) => ({ ...acc, [curr.key]: curr.value }), {})
 }

@@ -4,8 +4,8 @@ import { getBlogList } from '@/lib/data'
 import styles from './page.module.css'
 import type { Metadata } from 'next'
 
-// Cache page for 1 hour, revalidate in background
-export const revalidate = 3600
+// Render dynamically — requires DB access
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'Blog',
@@ -39,6 +39,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     <p className={styles.description}>
                         Thoughts on product engineering, systems design, and building with intention.
                     </p>
+                    {!tag && articles.length > 0 && (
+                        <div className={styles.headerMeta}>
+                            <span>{total} article{total !== 1 ? 's' : ''}</span>
+                        </div>
+                    )}
                     {tag && (
                         <div className={styles.filterInfo}>
                             Showing posts tagged: <strong>{tag}</strong>
