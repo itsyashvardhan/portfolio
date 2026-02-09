@@ -36,109 +36,139 @@ export async function getBlogList(options?: {
     const { page = 1, limit = 10, tag } = options || {}
     const offset = (page - 1) * limit
 
-    const conditions = [eq(blog.status, 'published')]
-    if (tag) {
-        conditions.push(arrayContains(blog.tags, [tag]))
-    }
+    try {
+        const conditions = [eq(blog.status, 'published')]
+        if (tag) {
+            conditions.push(arrayContains(blog.tags, [tag]))
+        }
 
-    const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions)
+        const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions)
 
-    const [articles, countResult] = await Promise.all([
-        db
-            .select({
-                slug: blog.slug,
-                title: blog.title,
-                excerpt: blog.excerpt,
-                banner_image: blog.banner_image,
-                tags: blog.tags,
-                read_time: blog.read_time,
-                created_at: blog.created_at,
-                published_at: blog.published_at,
-            })
-            .from(blog)
-            .where(whereClause)
-            .orderBy(desc(blog.published_at), desc(blog.created_at))
-            .limit(limit)
-            .offset(offset),
-        db
-            .select({ count: sql<number>`count(*)::int` })
-            .from(blog)
-            .where(whereClause),
-    ])
+        const [articles, countResult] = await Promise.all([
+            db
+                .select({
+                    slug: blog.slug,
+                    title: blog.title,
+                    excerpt: blog.excerpt,
+                    banner_image: blog.banner_image,
+                    tags: blog.tags,
+                    read_time: blog.read_time,
+                    created_at: blog.created_at,
+                    published_at: blog.published_at,
+                })
+                .from(blog)
+                .where(whereClause)
+                .orderBy(desc(blog.published_at), desc(blog.created_at))
+                .limit(limit)
+                .offset(offset),
+            db
+                .select({ count: sql<number>`count(*)::int` })
+                .from(blog)
+                .where(whereClause),
+        ])
 
-    const total = countResult[0]?.count || 0
+        const total = countResult[0]?.count || 0
 
-    return {
-        articles: articles as BlogListItem[],
-        total,
-        page,
-        limit,
-        hasMore: total > page * limit,
+        return {
+            articles: articles as BlogListItem[],
+            total,
+            page,
+            limit,
+            hasMore: total > page * limit,
+        }
+    } catch (e) {
+        console.error('Error fetching blog list:', e)
+        return { articles: [], total: 0, page, limit, hasMore: false }
     }
 }
 
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
-    const [result] = await db
-        .select()
-        .from(blog)
-        .where(and(eq(blog.slug, slug), eq(blog.status, 'published')))
-        .limit(1)
+    try {
+        const [result] = await db
+            .select()
+            .from(blog)
+            .where(and(eq(blog.slug, slug), eq(blog.status, 'published')))
+            .limit(1)
 
-    return (result as Blog) || null
+        return (result as Blog) || null
+    } catch (e) {
+        console.error('Error fetching blog by slug:', e)
+        return null
+    }
 }
 
 export async function getAllBlogSlugs(): Promise<string[]> {
-    const result = await db
-        .select({ slug: blog.slug })
-        .from(blog)
-        .where(eq(blog.status, 'published'))
+    try {
+        const result = await db
+            .select({ slug: blog.slug })
+            .from(blog)
+            .where(eq(blog.status, 'published'))
 
-    return result.map(item => item.slug)
+        return result.map(item => item.slug)
+    } catch (e) {
+        console.error('Error fetching blog slugs:', e)
+        return []
+    }
 }
 
 export async function getWorksList(): Promise<WorksPageData> {
-    const result = await db
-        .select({
-            slug: works.slug,
-            title: works.title,
-            description: works.description,
-            outcome: works.outcome,
-            tech_stack: works.tech_stack,
-            repo_url: works.repo_url,
-            demo_url: works.demo_url,
-            demo_label: works.demo_label,
-            project_status: works.project_status,
-            featured: works.featured,
-        })
-        .from(works)
-        .where(eq(works.status, 'published'))
-        .orderBy(asc(works.display_order))
+    try {
+        const result = await db
+            .select({
+                slug: works.slug,
+                title: works.title,
+                description: works.description,
+                outcome: works.outcome,
+                tech_stack: works.tech_stack,
+                repo_url: works.repo_url,
+                demo_url: works.demo_url,
+                demo_label: works.demo_label,
+                project_status: works.project_status,
+                featured: works.featured,
+            })
+            .from(works)
+            .where(eq(works.status, 'published'))
+            .orderBy(asc(works.display_order))
 
-    const projects = result as WorkListItem[]
+        const projects = result as WorkListItem[]
 
-    return {
-        projects,
-        featured: projects.filter(p => p.featured),
+        return {
+            projects,
+            featured: projects.filter(p => p.featured),
+        }
+    } catch (e) {
+        console.error('Error fetching works list:', e)
+        return { projects: [], featured: [] }
     }
 }
 
 export async function getWorkBySlug(slug: string): Promise<Work | null> {
-    const [result] = await db
-        .select()
-        .from(works)
-        .where(and(eq(works.slug, slug), eq(works.status, 'published')))
-        .limit(1)
+    try {
+        const [result] = await db
+            .select()
+            .from(works)
+            .where(and(eq(works.slug, slug), eq(works.status, 'published')))
+            .limit(1)
 
-    return (result as Work) || null
+        return (result as Work) || null
+    } catch (e) {
+        console.error('Error fetching work by slug:', e)
+        return null
+    }
 }
 
 export async function getAllWorkSlugs(): Promise<string[]> {
-    const result = await db
-        .select({ slug: works.slug })
-        .from(works)
-        .where(eq(works.status, 'published'))
+    try {
+        const result = await db
+            .select({ slug: works.slug })
+            .from(works)
+            .where(eq(works.status, 'published'))
 
-    return result.map(item => item.slug)
+        return result.map(item => item.slug)
+    } catch (e) {
+        console.error('Error fetching work slugs:', e)
+        return []
+    }
 }
 
 export async function getProfile(): Promise<Profile | null> {
