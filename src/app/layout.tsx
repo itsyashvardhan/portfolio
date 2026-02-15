@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, DotGothic16 } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { ConsoleMessage } from "./console-message";
 import "./globals.css";
 
