@@ -1,6 +1,7 @@
 .page {
     min-height: 100vh;
     padding-bottom: var(--space-12);
+    overflow-x: clip;
 }
 
 .header {
@@ -11,16 +12,16 @@
 .header::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 18px;
+    left: -70px;
+    right: -70px;
     height: 1px;
     background: linear-gradient(
         to right,
         transparent,
         var(--color-border) 10%,
         var(--color-border) 40%,
-        transparent 70%
+        transparent 90%
     );
 }
 
@@ -105,33 +106,18 @@
 .card {
     padding: var(--space-5);
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 1px solid color-mix(in srgb, var(--color-border), transparent 10%);
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    transition: border-color var(--transition-base), transform var(--transition-base);
     position: relative;
-    overflow: hidden;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 0;
-    background: var(--color-text);
-    transition: height var(--transition-slow);
-    border-radius: 0 0 1px 0;
+    overflow: clip;
 }
 
 .card:hover {
-    border-color: var(--color-text-tertiary);
-}
-
-.card:hover::before {
-    height: 100%;
+    border-color: color-mix(in srgb, var(--color-text), transparent 55%);
+    transform: translateY(-1px);
 }
 
 /* Card Header */

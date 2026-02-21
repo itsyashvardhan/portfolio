@@ -1,10 +1,8 @@
 .landing {
-    height: 100vh;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
     padding: var(--space-5);
     overflow: hidden;
     position: relative;
@@ -19,13 +17,22 @@
     justify-content: center;
     text-align: center;
     z-index: 1;
-    /* No flex:1, let content be naturally centered by parent */
+    width: min(92vw, 760px);
+    max-width: 760px;
+    min-height: 42dvh;
+}
+
+.themeToggleWrap {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 20;
 }
 
 /* Header & Tagline */
 .header {
     margin-bottom: 0;
-    animation: nameEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: nameEntrance 620ms ease-out forwards;
 }
 
 .tagline {
@@ -52,7 +59,7 @@
 @keyframes nameEntrance {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(10px);
     }
 
     to {
@@ -62,44 +69,43 @@
 }
 
 .name {
-    font-size: clamp(4rem, 16vw, 10rem);
-    font-weight: var(--font-bold);
-    letter-spacing: -0.04em;
+    font-size: clamp(88px, 7.8vw, 124px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
     line-height: 1;
     margin-bottom: 0;
     color: var(--color-text);
 }
 
 .phonetic {
-    font-size: var(--text-base);
-    font-weight: var(--font-semibold);
-    color: var(--color-text);
-    opacity: 0.7;
-    letter-spacing: 0.2em;
-    margin-top: var(--space-3);
+    font-size: 1.24rem;
+    font-weight: 550;
+    color: color-mix(in srgb, var(--color-text), transparent 10%);
+    letter-spacing: 0.22em;
+    margin-top: 16px;
     opacity: 0;
-    animation: fadeIn 0.8s ease-out 0.4s forwards;
+    animation: fadeIn 620ms ease-out 120ms forwards;
 }
 
 .philosophy {
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.08em;
-    margin-top: var(--space-6);
+    font-size: 1.04rem;
+    font-weight: 400;
+    color: color-mix(in srgb, var(--color-text), transparent 28%);
+    letter-spacing: 0.04em;
+    margin-top: 12px;
     font-style: italic;
     opacity: 0;
-    animation: fadeIn 1s ease-out 0.6s forwards;
+    animation: fadeIn 720ms ease-out 200ms forwards;
 }
 
 /* Navigation */
 .nav {
     display: flex;
     justify-content: center;
-    gap: var(--space-12);
-    margin-top: var(--space-8);
+    gap: 56px;
+    margin-top: 36px;
     position: relative;
-    animation: navEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    animation: navEntrance 760ms ease-out 180ms forwards;
     opacity: 0;
 }
 
@@ -120,19 +126,31 @@
     flex-direction: row;
     align-items: center;
     gap: var(--space-2);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--color-text), transparent 28%);
     text-decoration: none;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     padding: var(--space-3) var(--space-2);
-    transition: color var(--transition-base);
+    transition: color 200ms ease-out, opacity 200ms ease-out;
     position: relative;
+    opacity: 0.76;
 }
 
 .link:hover {
+    color: color-mix(in srgb, var(--color-text), transparent 8%);
+    opacity: 1;
+}
+
+.link:focus-visible {
+    color: color-mix(in srgb, var(--color-text), transparent 8%);
+    opacity: 1;
+}
+
+.link:active {
     color: var(--color-text);
+    opacity: 1;
 }
 
 /* Footer */
@@ -152,7 +170,7 @@
     font-weight: var(--font-medium);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--color-text-secondary);
+    color: color-mix(in srgb, var(--color-text), transparent 40%);
 }
 
 /* Icons hidden on desktop */
@@ -166,8 +184,25 @@
         padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px));
     }
 
+    .themeToggleWrap {
+        top: var(--space-3);
+        right: var(--space-3);
+    }
+
     .name {
-        font-size: clamp(3rem, 20vw, 5rem);
+        font-size: clamp(48px, 16vw, 72px);
+        letter-spacing: -1px;
+    }
+
+    .phonetic {
+        font-size: 1.02rem;
+        letter-spacing: 0.18em;
+        margin-top: 14px;
+    }
+
+    .philosophy {
+        font-size: 0.98rem;
+        margin-top: 10px;
     }
 
     .nav {
@@ -178,8 +213,8 @@
         margin-top: 0;
         gap: 0;
         justify-content: space-around;
-        background: var(--color-surface);
-        border-top: 1px solid var(--color-border);
+        background: color-mix(in srgb, var(--color-surface), transparent 8%);
+        border-top: 1px solid color-mix(in srgb, var(--color-border), transparent 10%);
         padding: var(--space-4) var(--space-2);
         padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
         opacity: 1;
@@ -190,8 +225,9 @@
         flex-direction: column;
         gap: var(--space-1);
         font-size: 9px;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
         flex: 1;
+        color: color-mix(in srgb, var(--color-text), transparent 20%);
     }
 
     .icon {

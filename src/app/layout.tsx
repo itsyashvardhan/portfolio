@@ -112,6 +112,14 @@ export const metadata: Metadata = {
   applicationName: `${ownerName} Portfolio`,
   category: 'technology',
   classification: 'Portfolio',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -119,6 +127,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeInitScript = `
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem('portfolio-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme === 'dark' || savedTheme === 'light'
+          ? savedTheme
+          : (prefersDark ? 'dark' : 'light');
+        const root = document.documentElement;
+        root.classList.remove('theme-light', 'theme-dark');
+        root.classList.add(theme === 'dark' ? 'theme-dark' : 'theme-light');
+      } catch {}
+    })();
+  `;
+
   // JSON-LD structured data for SEO
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -138,6 +161,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${dotMatrix.variable}`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"

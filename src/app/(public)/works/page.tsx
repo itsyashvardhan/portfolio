@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getWorksList } from '@/lib/data'
 import styles from './page.module.css'
+import { CardSpotlight } from '@/components/ui/card-spotlight'
 import type { Metadata } from 'next'
 
 // Render dynamically — requires DB access
@@ -70,7 +71,7 @@ function ProjectCard({
     const badge = getStatusBadge(project.project_status)
 
     return (
-        <div className={styles.card}>
+        <CardSpotlight className={styles.card}>
             {/* Card Header */}
             <div className={styles.cardHeader}>
                 <span className={styles.cardIcon}>◈</span>
@@ -144,6 +145,6 @@ function ProjectCard({
                     )}
                 </div>
             </div>
-        </div>
+        </CardSpotlight>
     )
 }

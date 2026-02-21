@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ThemeToggle } from '@/components/theme-toggle'
 import styles from './page.module.css'
 
 // Environment variables for branding
@@ -9,6 +10,9 @@ const heroTagline = process.env.NEXT_PUBLIC_HERO_TAGLINE || ''
 export default function Home() {
   return (
     <div className={styles.landing}>
+      <div className={styles.themeToggleWrap}>
+        <ThemeToggle />
+      </div>
       <div className={styles.content}>
         <header className={styles.header}>
           <h1 className={styles.name}>{heroName}</h1>
@@ -25,6 +29,10 @@ export default function Home() {
             <span className={styles.icon}>◈</span>
             <span className={styles.label}>Works</span>
           </Link>
+          <Link href="/india-ai" className={styles.link}>
+            <span className={styles.icon}>AI</span>
+            <span className={styles.label}>AI</span>
+          </Link>
           <Link href="/about" className={styles.link}>
             <span className={styles.icon}>@</span>
             <span className={styles.label}>About</span>
@@ -34,6 +42,4 @@ export default function Home() {
     </div>
   )
 }
-
-
 

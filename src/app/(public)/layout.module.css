@@ -32,6 +32,12 @@
     justify-content: space-between;
 }
 
+.navActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
 .logo {
     font-size: var(--text-lg);
     font-weight: var(--font-bold);
@@ -75,6 +81,10 @@
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         background: var(--color-bg);
+    }
+
+    .navActions {
+        gap: var(--space-2);
     }
 
     .links {
