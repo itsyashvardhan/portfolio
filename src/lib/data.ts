@@ -11,6 +11,12 @@ import {
     settings,
 } from '@/lib/db/schema'
 import { eq, desc, asc, sql, and, arrayContains } from 'drizzle-orm'
+import {
+    fallbackBlogListItems,
+    fallbackBlogPosts,
+    fallbackWorkListItems,
+    fallbackWorks,
+} from '@/lib/fallback-content'
 import type {
     Blog,
     BlogListItem,
@@ -78,7 +84,18 @@ export async function getBlogList(options?: {
         }
     } catch (e) {
         console.error('Error fetching blog list:', e)
-        return { articles: [], total: 0, page, limit, hasMore: false }
+        const filtered = tag
+            ? fallbackBlogListItems.filter((item) => item.tags.includes(tag))
+            : fallbackBlogListItems
+        const paginated = filtered.slice(offset, offset + limit)
+
+        return {
+            articles: paginated,
+            total: filtered.length,
+            page,
+            limit,
+            hasMore: filtered.length > page * limit,
+        }
     }
 }
 
@@ -93,7 +110,7 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
         return (result as Blog) || null
     } catch (e) {
         console.error('Error fetching blog by slug:', e)
-        return null
+        return fallbackBlogPosts.find((post) => post.slug === slug) || null
     }
 }
 
@@ -107,7 +124,7 @@ export async function getAllBlogSlugs(): Promise<string[]> {
         return result.map(item => item.slug)
     } catch (e) {
         console.error('Error fetching blog slugs:', e)
-        return []
+        return fallbackBlogPosts.map((post) => post.slug)
     }
 }
 
@@ -131,6 +148,12 @@ export async function getWorksList(): Promise<WorksPageData> {
             .orderBy(asc(works.display_order))
 
         const projects = result as WorkListItem[]
+        if (projects.length === 0) {
+            return {
+                projects: fallbackWorkListItems,
+                featured: fallbackWorkListItems.filter((project) => project.featured),
+            }
+        }
 
         return {
             projects,
@@ -138,7 +161,10 @@ export async function getWorksList(): Promise<WorksPageData> {
         }
     } catch (e) {
         console.error('Error fetching works list:', e)
-        return { projects: [], featured: [] }
+        return {
+            projects: fallbackWorkListItems,
+            featured: fallbackWorkListItems.filter((project) => project.featured),
+        }
     }
 }
 
@@ -150,10 +176,10 @@ export async function getWorkBySlug(slug: string): Promise<Work | null> {
             .where(and(eq(works.slug, slug), eq(works.status, 'published')))
             .limit(1)
 
-        return (result as Work) || null
+        return (result as Work) || fallbackWorks.find((work) => work.slug === slug) || null
     } catch (e) {
         console.error('Error fetching work by slug:', e)
-        return null
+        return fallbackWorks.find((work) => work.slug === slug) || null
     }
 }
 
@@ -164,10 +190,11 @@ export async function getAllWorkSlugs(): Promise<string[]> {
             .from(works)
             .where(eq(works.status, 'published'))
 
-        return result.map(item => item.slug)
+        const slugs = result.map(item => item.slug)
+        return slugs.length > 0 ? slugs : fallbackWorks.map((work) => work.slug)
     } catch (e) {
         console.error('Error fetching work slugs:', e)
-        return []
+        return fallbackWorks.map((work) => work.slug)
     }
 }
 
