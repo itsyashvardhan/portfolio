@@ -49,7 +49,7 @@ export const indiaAiDirectory = {
           "website": "https://panchayatiraj.gov.in",
           "contact": "+91-11-23387782",
           "email": "secypr@nic.in",
-          "linkedin": "linkedin.com/company/ministry-of-panchayati-raj",
+          "linkedin": "linkedin.com/company/ministryofpanchayatiraj",
           "notes": "Rural digital governance, e-GramSwaraj auditing"
         },
         {
@@ -236,7 +236,7 @@ export const indiaAiDirectory = {
           "website": "https://assam.gov.in",
           "contact": "+91-361-2263745",
           "email": "secy-it@assam.gov.in",
-          "linkedin": "linkedin.com/company/government-of-assam",
+          "linkedin": "linkedin.com/company/govt-assam",
           "notes": "Assam Digital Mission, Northeast digital connectivity"
         },
         {
@@ -254,7 +254,7 @@ export const indiaAiDirectory = {
           "website": "https://it.uk.gov.in",
           "contact": "+91-135-2669764",
           "email": "secy.it@uk.gov.in",
-          "linkedin": "linkedin.com/company/government-of-uttarakhand",
+          "linkedin": "linkedin.com/company/uttarakhandgov",
           "notes": "Devbhoomi Digital, Smart Char Dham, eGovernance"
         },
         {
@@ -405,7 +405,7 @@ export const indiaAiDirectory = {
           "website": "https://anrf.gov.in",
           "contact": "+91-11-66307000",
           "email": "info@anrf.gov.in",
-          "linkedin": "linkedin.com/company/anusandhan-national-research-foundation",
+          "linkedin": "linkedin.com/in/anrfindia",
           "notes": "Research funding AI, grant management systems audit"
         },
         {
@@ -414,7 +414,7 @@ export const indiaAiDirectory = {
           "website": "https://www.cris.org.in",
           "contact": "+91-11-23342266",
           "email": "md@cris.org.in",
-          "linkedin": "linkedin.com/company/cris-india",
+          "linkedin": "linkedin.com/company/centre-for-railway-information-systems",
           "notes": "Railway IT backbone, PRS/UTS systems, AI for rail"
         },
         {
@@ -441,7 +441,7 @@ export const indiaAiDirectory = {
           "website": "https://tropmet.res.in",
           "contact": "+91-20-25904200",
           "email": "director@tropmet.res.in",
-          "linkedin": "linkedin.com/company/iitm-pune",
+          "linkedin": "linkedin.com/school/iitm",
           "notes": "Climate AI, monsoon prediction, environmental data"
         },
         {
@@ -522,7 +522,7 @@ export const indiaAiDirectory = {
           "website": "https://dte.delhi.gov.in",
           "contact": "+91-11-23392689",
           "email": "dte@delhi.gov.in",
-          "linkedin": "linkedin.com/company/delhi-government",
+          "linkedin": "linkedin.com/company/government-of-delhi",
           "notes": "Skill development AI, polytechnic digital systems"
         }
       ]
@@ -556,7 +556,7 @@ export const indiaAiDirectory = {
           "website": "https://indo-german.com",
           "contact": "+91-22-66657000",
           "email": "info@indo-german.com",
-          "linkedin": "linkedin.com/company/ahk-india",
+          "linkedin": "linkedin.com/company/indo-german-chamber-of-commerce",
           "notes": "German tech companies India entry, Industry 4.0 audit"
         },
         {
@@ -574,7 +574,7 @@ export const indiaAiDirectory = {
           "website": "https://www.eda.admin.ch/newdelhi",
           "contact": "+91-11-49959500",
           "email": "newdelhi@eda.admin.ch",
-          "linkedin": "linkedin.com/company/swiss-embassy-india",
+          "linkedin": "linkedin.com/company/embassy-of-switzerland-in-india-and-bhutan",
           "notes": "Swiss precision tech, fintech, life sciences AI"
         },
         {
@@ -592,7 +592,7 @@ export const indiaAiDirectory = {
           "website": "https://mtt.gov.rs",
           "contact": "+381-11-3617-555",
           "email": "kabinet@mtt.gov.rs",
-          "linkedin": "linkedin.com/company/serbian-government",
+          "linkedin": "linkedin.com/company/government-of-the-republic-of-serbia",
           "notes": "Eastern Europe AI expansion, digital services"
         },
         {
@@ -601,7 +601,7 @@ export const indiaAiDirectory = {
           "website": "https://www.netherlandsworldwide.nl/india",
           "contact": "+91-11-24197600",
           "email": "nde@minbuza.nl",
-          "linkedin": "linkedin.com/company/netherlands-embassy-india",
+          "linkedin": "linkedin.com/company/netherlands-embassy-in-india",
           "notes": "Dutch AI ethics, agri-tech, water management AI"
         },
         {
@@ -610,7 +610,7 @@ export const indiaAiDirectory = {
           "website": "https://akistech.com",
           "contact": "+7-812-430-6060",
           "email": "info@akistech.com",
-          "linkedin": "linkedin.com/company/akis-tech",
+          "linkedin": "linkedin.com/company/russoft",
           "notes": "Russian software companies, enterprise IT solutions"
         },
         {
@@ -637,7 +637,7 @@ export const indiaAiDirectory = {
           "website": "https://mci.tj",
           "contact": "+992-372-210210",
           "email": "info@mci.tj",
-          "linkedin": "linkedin.com/company/government-of-tajikistan",
+          "linkedin": "linkedin.com/company/govtj",
           "notes": "Central Asia AI development, digital economy expansion"
         },
         {
@@ -1016,7 +1016,7 @@ export const indiaAiDirectory = {
           "website": "https://redingtongroup.com",
           "contact": "+91-44-42243353",
           "email": "corporate@redingtongroup.com",
-          "linkedin": "linkedin.com/company/redington-india",
+          "linkedin": "linkedin.com/company/redingtonlimited",
           "notes": "IT distribution, AI product supply chain audit"
         },
         {
@@ -1068,7 +1068,7 @@ export const indiaAiDirectory = {
           "website": "https://neevcloud.com",
           "contact": "+91-79-40045000",
           "email": "info@neevcloud.com",
-          "linkedin": "linkedin.com/company/neevcloud",
+          "linkedin": "linkedin.com/company/neevcloud-india",
           "notes": "GPU cloud, AI training infrastructure, startup ecosystem"
         },
         {
@@ -1077,7 +1077,7 @@ export const indiaAiDirectory = {
           "website": "https://neysa.net",
           "contact": "+91-40-67198000",
           "email": "info@neysa.net",
-          "linkedin": "linkedin.com/company/neysa-networks",
+          "linkedin": "linkedin.com/company/neysaai",
           "notes": "AI cloud compute, GPU-as-a-service, model training"
         },
         {
@@ -1086,7 +1086,7 @@ export const indiaAiDirectory = {
           "website": "https://esds.co.in",
           "contact": "+91-253-6630555",
           "email": "info@esds.co.in",
-          "linkedin": "linkedin.com/company/esds-software-solution-limited",
+          "linkedin": "linkedin.com/company/esdsdc",
           "notes": "Cloud hosting, managed services, compliance audit"
         },
         {
@@ -1210,7 +1210,7 @@ export const indiaAiDirectory = {
           "website": "https://intellectdesign.com",
           "contact": "+91-44-39913000",
           "email": "info@intellectdesign.com",
-          "linkedin": "linkedin.com/company/intellect-design-arena",
+          "linkedin": "linkedin.com/company/intellect_design_arena",
           "notes": "Financial AI, FinTech iGTB, banking technology audit"
         },
         {
@@ -1280,7 +1280,7 @@ export const indiaAiDirectory = {
           "website": "https://prisma-ai.com",
           "contact": "Via website",
           "email": "contact@prisma-ai.com",
-          "linkedin": "linkedin.com/company/prisma-ai",
+          "linkedin": "linkedin.com/company/prisma-ro",
           "notes": "Vision AI, content moderation, AI product audit"
         },
         {
@@ -1289,7 +1289,7 @@ export const indiaAiDirectory = {
           "website": "https://turiyam.ai",
           "contact": "Via website",
           "email": "info@turiyam.ai",
-          "linkedin": "linkedin.com/company/turiyam",
+          "linkedin": "linkedin.com/company/turiyam-ai",
           "notes": "AI chip design, semiconductor AI, hardware audit"
         },
         {
@@ -1343,7 +1343,7 @@ export const indiaAiDirectory = {
           "website": "https://ltvyoma.com",
           "contact": "+91-22-67525656",
           "email": "info@ltvyoma.com",
-          "linkedin": "linkedin.com/company/lt-vyoma",
+          "linkedin": "linkedin.com/company/larsentoubrovyoma",
           "notes": "Space tech AI, satellite communication, defence"
         },
         {
@@ -1388,7 +1388,7 @@ export const indiaAiDirectory = {
           "website": "https://erosinnovation.com",
           "contact": "Via website",
           "email": "info@erosinnovation.com",
-          "linkedin": "linkedin.com/company/eros-innovation",
+          "linkedin": "linkedin.com/company/erosinnovation",
           "notes": "Entertainment AI, OTT analytics, content audit"
         },
         {
@@ -1415,7 +1415,7 @@ export const indiaAiDirectory = {
           "website": "https://blockchainforimpact.org",
           "contact": "Via website",
           "email": "info@blockchainforimpact.org",
-          "linkedin": "linkedin.com/company/blockchain-for-impact",
+          "linkedin": "linkedin.com/company/blockchain-for-impact-bfi",
           "notes": "Social impact blockchain, transparency audit, ESG"
         },
         {
@@ -1449,7 +1449,7 @@ export const indiaAiDirectory = {
           "website": "https://escindia.in",
           "contact": "+91-11-26867205",
           "email": "info@escindia.in",
-          "linkedin": "linkedin.com/company/electronic-software-export-promotion-council",
+          "linkedin": "linkedin.com/company/esc-india",
           "notes": "IT export promotion, industry standards, digital audit"
         },
         {
@@ -1467,7 +1467,7 @@ export const indiaAiDirectory = {
           "website": "https://tsia.com",
           "contact": "+1-858-674-5491",
           "email": "info@tsia.com",
-          "linkedin": "linkedin.com/company/tsia",
+          "linkedin": "linkedin.com/company/technology-services-industry-association-tsia",
           "notes": "Tech services benchmarking, AI services audit standards"
         },
         {
@@ -1485,7 +1485,7 @@ export const indiaAiDirectory = {
           "website": "https://isolaralliance.org",
           "contact": "+91-124-4559399",
           "email": "info@isolaralliance.org",
-          "linkedin": "linkedin.com/company/international-solar-alliance",
+          "linkedin": "linkedin.com/company/internationalsolaralliance",
           "notes": "Solar AI, clean energy tech, sustainability audit"
         },
         {
