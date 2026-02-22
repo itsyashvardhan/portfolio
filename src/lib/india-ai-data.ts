@@ -31,7 +31,7 @@ export const indiaAiDirectory = {
           "website": "https://www.meity.gov.in",
           "contact": "Minister's Office: +91-11-24301851",
           "email": "secretary@meity.gov.in",
-          "linkedin": "linkedin.com/company/meity",
+          "linkedin": "linkedin.com/company/meity-in",
           "notes": "Key decision-maker for digital India, AI policy, and IT audit mandates"
         },
         {
@@ -40,7 +40,7 @@ export const indiaAiDirectory = {
           "website": "https://www.education.gov.in",
           "contact": "+91-11-23383936",
           "email": "secy.edu@nic.in",
-          "linkedin": "linkedin.com/company/ministry-of-education-india",
+          "linkedin": "linkedin.com/company/ministry-of-education-government-of-india",
           "notes": "EdTech, AI in education, student data audit opportunities"
         },
         {
@@ -58,7 +58,7 @@ export const indiaAiDirectory = {
           "website": "https://www.msde.gov.in",
           "contact": "+91-11-26162519",
           "email": "ps.secy-msde@gov.in",
-          "linkedin": "linkedin.com/company/msde-gov-in",
+          "linkedin": "linkedin.com/company/ministry-of-skill-development-and-entrepreneurship-india",
           "notes": "Skill India Digital, AI-based training platform audits"
         },
         {
@@ -76,7 +76,7 @@ export const indiaAiDirectory = {
           "website": "https://dfpd.gov.in",
           "contact": "+91-11-23070637",
           "email": "secy-ca@nic.in",
-          "linkedin": "linkedin.com/company/dfpd",
+          "linkedin": "",
           "notes": "Food supply chain digital audit, PDS technology systems"
         },
         {
@@ -85,7 +85,7 @@ export const indiaAiDirectory = {
           "website": "https://rural.nic.in",
           "contact": "+91-11-23386084",
           "email": "secy-rd@nic.in",
-          "linkedin": "linkedin.com/company/ministry-of-rural-development-india",
+          "linkedin": "linkedin.com/company/ministry-of-rural-development",
           "notes": "MGNREGA digital systems, AI for rural welfare audit"
         },
         {
@@ -94,7 +94,7 @@ export const indiaAiDirectory = {
           "website": "https://agricoop.nic.in",
           "contact": "+91-11-23382651",
           "email": "secy-agri@gov.in",
-          "linkedin": "linkedin.com/company/ministry-of-agriculture-india",
+          "linkedin": "linkedin.com/company/agrigoi",
           "notes": "AgriStack, digital crop monitoring, AI for farming"
         },
         {
@@ -103,7 +103,7 @@ export const indiaAiDirectory = {
           "website": "https://tribal.nic.in",
           "contact": "+91-11-23387529",
           "email": "secy.tribal@nic.in",
-          "linkedin": "linkedin.com/company/ministry-of-tribal-affairs",
+          "linkedin": "",
           "notes": "Tribal welfare digital programs, PM JANMAN scheme"
         },
         {
@@ -130,7 +130,7 @@ export const indiaAiDirectory = {
           "website": "https://mohfw.gov.in",
           "contact": "+91-11-23061863",
           "email": "secy-hfw@nic.in",
-          "linkedin": "linkedin.com/company/ministry-of-health-and-family-welfare",
+          "linkedin": "",
           "notes": "Ayushman Bharat digital health, AI diagnostics audit"
         }
       ]
@@ -173,7 +173,7 @@ export const indiaAiDirectory = {
           "website": "https://doitc.rajasthan.gov.in",
           "contact": "+91-141-2922345",
           "email": "secretary.doitc@rajasthan.gov.in",
-          "linkedin": "linkedin.com/company/doit-c-rajasthan",
+          "linkedin": "linkedin.com/company/doitc",
           "notes": "RajStack, Bhamashah digital platform auditing"
         },
         {
@@ -218,7 +218,7 @@ export const indiaAiDirectory = {
           "website": "https://itmission.kerala.gov.in",
           "contact": "+91-471-2725640",
           "email": "info@itmission.kerala.gov.in",
-          "linkedin": "linkedin.com/company/kerala-it-mission",
+          "linkedin": "linkedin.com/company/kerala-state-it-mission",
           "notes": "Kerala Fiber Optic Network, K-DISC, AI for public services"
         },
         {
@@ -245,7 +245,7 @@ export const indiaAiDirectory = {
           "website": "https://itegc.ap.gov.in",
           "contact": "+91-866-2565528",
           "email": "secretary@itegc.ap.gov.in",
-          "linkedin": "linkedin.com/company/ap-government",
+          "linkedin": "",
           "notes": "Fiber Grid, real-time governance data systems audit"
         },
         {
@@ -317,7 +317,7 @@ export const indiaAiDirectory = {
           "website": "https://gujaratinformatics.com",
           "contact": "+91-79-23256022",
           "email": "md@gil.gujarat.gov.in",
-          "linkedin": "linkedin.com/company/gujarat-informatics-limited",
+          "linkedin": "linkedin.com/company/gujarat-informatics-ltd",
           "notes": "Gujarat IT/ITeS Policy, GIFT City digital infrastructure"
         }
       ]
@@ -450,7 +450,7 @@ export const indiaAiDirectory = {
           "website": "https://nha.gov.in",
           "contact": "+91-11-23753417",
           "email": "ceo@nha.gov.in",
-          "linkedin": "linkedin.com/company/national-health-authority",
+          "linkedin": "linkedin.com/company/ayushmannha",
           "notes": "Ayushman Bharat Digital Mission, health data audit"
         },
         {
