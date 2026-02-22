@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     description: `${ownerTitle} specializing in systems design and building products with intention.`,
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: `${ownerName} — ${ownerTitle}`,
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${ownerName} — ${ownerTitle}`,
     description: `${ownerTitle} specializing in systems design and building products with intention.`,
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
     creator: ownerTwitter,
   },
 
@@ -148,7 +148,7 @@ export default function RootLayout({
     '@type': 'Person',
     name: ownerName,
     url: siteUrl,
-    image: `${siteUrl}/og-image.png`,
+    image: `${siteUrl}/og-image.jpg`,
     jobTitle: ownerTitle,
     description: `${ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
     sameAs: [
