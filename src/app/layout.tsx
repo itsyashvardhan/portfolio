@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, DotGothic16 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ConsoleMessage } from "./console-message";
+import { getSiteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,15 +19,6 @@ const dotMatrix = DotGothic16({
   display: 'swap',
 });
 
-// Environment variables for personal info
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
-const ownerName = process.env.NEXT_PUBLIC_OWNER_NAME || 'Your Name';
-const ownerTitle = process.env.NEXT_PUBLIC_OWNER_TITLE || 'Software Engineer';
-const ownerEmail = process.env.NEXT_PUBLIC_OWNER_EMAIL || 'email@example.com';
-const ownerGithub = process.env.NEXT_PUBLIC_OWNER_GITHUB || 'https://github.com/username';
-const ownerLinkedin = process.env.NEXT_PUBLIC_OWNER_LINKEDIN || 'https://linkedin.com/in/username';
-const ownerTwitter = process.env.NEXT_PUBLIC_OWNER_TWITTER || '@username';
-
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -37,96 +29,105 @@ export const viewport: Viewport = {
   ],
 }
 
-export const metadata: Metadata = {
-  // Core
-  title: {
-    default: `${ownerName} — ${ownerTitle}`,
-    template: `%s — ${ownerName}`
-  },
-  description: `${ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
-  keywords: [
-    ownerName,
-    "Product Engineer",
-    "Solutions Engineer",
-    "AI Developer",
-    "Systems Designer",
-    "Portfolio",
-    "Next.js",
-    "TypeScript",
-  ],
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteConfig();
+  const siteUrl = site.siteUrl;
+  const ownerName = site.ownerName;
+  const ownerTitle = site.ownerTitle;
+  const ownerTwitter = site.ownerTwitter;
 
-  // Authorship
-  authors: [{ name: ownerName, url: siteUrl }],
-  creator: ownerName,
-  publisher: ownerName,
-
-  // Canonical & Alternate
-  metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: '/',
-  },
-
-  // Open Graph
-  openGraph: {
-    type: "website",
-    locale: "en_IN",
-    url: siteUrl,
-    siteName: ownerName,
-    title: `${ownerName} — ${ownerTitle}`,
-    description: `${ownerTitle} specializing in systems design and building products with intention.`,
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: `${ownerName} — ${ownerTitle}`,
-      },
+  return {
+    // Core
+    title: {
+      default: `${ownerName} — ${ownerTitle}`,
+      template: `%s — ${ownerName}`
+    },
+    description: `${ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
+    keywords: [
+      ownerName,
+      "Product Engineer",
+      "Solutions Engineer",
+      "AI Developer",
+      "Systems Designer",
+      "Portfolio",
+      "Next.js",
+      "TypeScript",
     ],
-  },
 
-  // Twitter
-  twitter: {
-    card: "summary_large_image",
-    title: `${ownerName} — ${ownerTitle}`,
-    description: `${ownerTitle} specializing in systems design and building products with intention.`,
-    images: ['/og-image.jpg'],
-    creator: ownerTwitter,
-  },
+    // Authorship
+    authors: [{ name: ownerName, url: siteUrl }],
+    creator: ownerName,
+    publisher: ownerName,
 
-  // Robots & Crawling
-  robots: {
-    index: true,
-    follow: true,
-    nocache: false,
-    googleBot: {
+    // Canonical & Alternate
+    metadataBase: new URL(siteUrl),
+    alternates: {
+      canonical: '/',
+    },
+
+    // Open Graph
+    openGraph: {
+      type: "website",
+      locale: "en_IN",
+      url: siteUrl,
+      siteName: ownerName,
+      title: `${ownerName} — ${ownerTitle}`,
+      description: `${ownerTitle} specializing in systems design and building products with intention.`,
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: `${ownerName} — ${ownerTitle}`,
+        },
+      ],
+    },
+
+    // Twitter
+    twitter: {
+      card: "summary_large_image",
+      title: `${ownerName} — ${ownerTitle}`,
+      description: `${ownerTitle} specializing in systems design and building products with intention.`,
+      images: ['/og-image.jpg'],
+      creator: ownerTwitter,
+    },
+
+    // Robots & Crawling
+    robots: {
       index: true,
       follow: true,
-      noimageindex: false,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
-  },
 
-  // App & Icons
-  applicationName: `${ownerName} Portfolio`,
-  category: 'technology',
-  classification: 'Portfolio',
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico' },
-    ],
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
-  },
-};
+    // App & Icons
+    applicationName: `${ownerName} Portfolio`,
+    category: 'technology',
+    classification: 'Portfolio',
+    icons: {
+      icon: [
+        { url: '/icon.svg', type: 'image/svg+xml' },
+        { url: '/favicon.ico' },
+      ],
+      shortcut: '/icon.svg',
+      apple: '/icon.svg',
+    },
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const site = await getSiteConfig();
   const themeInitScript = `
     (() => {
       try {
@@ -146,16 +147,29 @@ export default function RootLayout({
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: ownerName,
-    url: siteUrl,
-    image: `${siteUrl}/og-image.jpg`,
-    jobTitle: ownerTitle,
-    description: `${ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
+    name: 'Your Name',
+    url: 'https://example.com',
+    image: 'https://example.com/og-image.jpg',
+    jobTitle: 'Software Engineer',
+    description: 'Software Engineer specializing in systems design, full-stack development, and building products with intention.',
     sameAs: [
-      ownerGithub,
-      ownerLinkedin,
+      'https://github.com/username',
+      'https://linkedin.com/in/username',
     ],
     knowsAbout: ['Product Engineering', 'Systems Design', 'Development', 'TypeScript', 'Next.js'],
+  };
+
+  const jsonLdData = {
+    ...jsonLd,
+    name: site.ownerName,
+    url: site.siteUrl,
+    image: `${site.siteUrl}/og-image.jpg`,
+    jobTitle: site.ownerTitle,
+    description: `${site.ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
+    sameAs: [
+      site.ownerGithub,
+      site.ownerLinkedin,
+    ],
   };
 
   return (
@@ -165,12 +179,16 @@ export default function RootLayout({
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         {children}
-        <ConsoleMessage />
+        <ConsoleMessage
+          ownerEmail={site.ownerEmail}
+          ownerGithub={site.ownerGithub}
+          ownerTitle={site.ownerTitle}
+        />
         <Analytics />
       </body>
     </html>

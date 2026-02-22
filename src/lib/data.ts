@@ -17,6 +17,7 @@ import {
     fallbackWorkListItems,
     fallbackWorks,
 } from '@/lib/fallback-content'
+import { getSiteConfig } from '@/lib/site-config'
 import type {
     Blog,
     BlogListItem,
@@ -211,12 +212,11 @@ export async function getProfile(): Promise<Profile | null> {
     }
 
     // Return default profile from env vars if table doesn't exist or is empty
-    const ownerName = process.env.NEXT_PUBLIC_OWNER_NAME || 'Your Name'
-    const ownerTitle = process.env.NEXT_PUBLIC_OWNER_TITLE || 'Software Engineer'
+    const site = await getSiteConfig()
     return {
         id: 'default',
-        name: ownerName,
-        title: ownerTitle,
+        name: site.ownerName,
+        title: site.ownerTitle,
         bio: 'I design and build systems that ship.',
         profile_image: null,
         location: 'Remote',
@@ -307,14 +307,12 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
         return result as SocialLink[]
     } catch (e) {
         // Return defaults from env vars if social_links table doesn't exist
-        const ownerEmail = process.env.NEXT_PUBLIC_OWNER_EMAIL || 'email@example.com'
-        const ownerGithub = process.env.NEXT_PUBLIC_OWNER_GITHUB || 'https://github.com/username'
-        const ownerLinkedin = process.env.NEXT_PUBLIC_OWNER_LINKEDIN || 'https://linkedin.com/in/username'
+        const site = await getSiteConfig()
 
         return [
-            { id: '1', platform: 'email', url: `mailto:${ownerEmail}`, display_name: ownerEmail, icon: null, display_order: 1, created_at: '' },
-            { id: '2', platform: 'github', url: ownerGithub, display_name: 'GitHub', icon: null, display_order: 2, created_at: '' },
-            { id: '3', platform: 'linkedin', url: ownerLinkedin, display_name: 'LinkedIn', icon: null, display_order: 3, created_at: '' },
+            { id: '1', platform: 'email', url: `mailto:${site.ownerEmail}`, display_name: site.ownerEmail, icon: null, display_order: 1, created_at: '' },
+            { id: '2', platform: 'github', url: site.ownerGithub, display_name: 'GitHub', icon: null, display_order: 2, created_at: '' },
+            { id: '3', platform: 'linkedin', url: site.ownerLinkedin, display_name: 'LinkedIn', icon: null, display_order: 3, created_at: '' },
         ]
     }
 }

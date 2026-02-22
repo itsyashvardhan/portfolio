@@ -2,12 +2,14 @@ import { MetadataRoute } from 'next'
 import { db } from '@/lib/db'
 import { works as worksTable, blog } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { getSiteConfig } from '@/lib/site-config'
 
 // Force dynamic rendering — sitemap needs DB access
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+    const site = await getSiteConfig()
+    const baseUrl = site.siteUrl
 
     // Fetch all published works
     const works = await db

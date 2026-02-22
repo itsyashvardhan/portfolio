@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { getSiteConfig } from '@/lib/site-config'
 import styles from './page.module.css'
 
-// Environment variables for branding
-const heroName = process.env.NEXT_PUBLIC_HERO_NAME || 'यशवर्धन'
-const heroPhonetic = process.env.NEXT_PUBLIC_HERO_PHONETIC || ''
-const heroTagline = process.env.NEXT_PUBLIC_HERO_TAGLINE || ''
+export default async function Home() {
+  const site = await getSiteConfig()
 
-export default function Home() {
   return (
     <div className={styles.landing}>
       <div className={styles.themeToggleWrap}>
@@ -15,9 +13,9 @@ export default function Home() {
       </div>
       <div className={styles.content}>
         <header className={styles.header}>
-          <h1 className={styles.name}>{heroName}</h1>
-          {heroPhonetic && <p className={styles.phonetic}>{heroPhonetic}</p>}
-          <p className={styles.philosophy}>{heroTagline}</p>
+          <h1 className={styles.name}>{site.heroName}</h1>
+          {site.heroPhonetic && <p className={styles.phonetic}>{site.heroPhonetic}</p>}
+          <p className={styles.philosophy}>{site.heroTagline}</p>
         </header>
 
         <nav className={styles.nav}>
@@ -42,4 +40,3 @@ export default function Home() {
     </div>
   )
 }
-

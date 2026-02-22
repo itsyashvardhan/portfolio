@@ -5,9 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import styles from './MobileNav.module.css'
 
-// Environment variable for logo/branding
-const logoText = process.env.NEXT_PUBLIC_LOGO_TEXT || '◈'
-
 const navLinks = [
     { href: '/ssh', label: 'Dashboard' },
     { href: '/ssh/writing', label: 'Writing' },
@@ -20,7 +17,7 @@ const navLinks = [
     { href: '/ssh/settings', label: 'Settings' },
 ]
 
-export default function MobileNav() {
+export default function MobileNav({ logoText }: { logoText: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const pathname = usePathname()
 

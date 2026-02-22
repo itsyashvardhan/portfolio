@@ -7,15 +7,14 @@ import { eq } from 'drizzle-orm'
 import styles from './layout.module.css'
 import Link from 'next/link'
 import MobileNav from './MobileNav'
-
-// Environment variable for logo/branding
-const logoText = process.env.NEXT_PUBLIC_LOGO_TEXT || '◈'
+import { getSiteConfig } from '@/lib/site-config'
 
 export default async function AdminLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const site = await getSiteConfig()
     const session = await getSession()
 
     // Redirect to login if not authenticated
@@ -42,12 +41,12 @@ export default async function AdminLayout({
     return (
         <div className={styles.layout}>
             {/* Mobile Navigation */}
-            <MobileNav />
+            <MobileNav logoText={site.logoText} />
 
             {/* Desktop Sidebar */}
             <aside className={styles.sidebar}>
                 <div className={styles.logo}>
-                    <span>{logoText}</span>
+                    <span>{site.logoText}</span>
                     <span className={styles.adminBadge}>Admin</span>
                 </div>
                 <nav className={styles.nav}>

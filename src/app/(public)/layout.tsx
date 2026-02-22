@@ -2,20 +2,20 @@ import React from 'react'
 import Link from 'next/link'
 import styles from './layout.module.css'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { getSiteConfig } from '@/lib/site-config'
 
-// Environment variable for logo/branding
-const logoText = process.env.NEXT_PUBLIC_LOGO_TEXT || '◈'
-
-export default function PublicLayout({
+export default async function PublicLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const site = await getSiteConfig()
+
     return (
         <div className={styles.layout}>
             <nav className={styles.nav}>
                 <div className={`container ${styles.navContainer}`}>
-                    <Link href="/" className={styles.logo}>{logoText}</Link>
+                    <Link href="/" className={styles.logo}>{site.logoText}</Link>
                     <div className={styles.navActions}>
                         <ul className={styles.links}>
                             <li><Link href="/works" className={styles.link} prefetch={true}>Works</Link></li>

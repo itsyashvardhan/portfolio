@@ -1,7 +1,9 @@
 import { MetadataRoute } from 'next'
+import { getSiteConfig } from '@/lib/site-config'
 
-export default function robots(): MetadataRoute.Robots {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+export default async function robots(): Promise<MetadataRoute.Robots> {
+    const site = await getSiteConfig()
+    const baseUrl = site.siteUrl
 
     return {
         rules: [
@@ -25,4 +27,3 @@ export default function robots(): MetadataRoute.Robots {
         host: baseUrl,
     }
 }
-
