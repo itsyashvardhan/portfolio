@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { LotusMandala } from '@/components/lotus-mandala'
 import { getSiteConfig } from '@/lib/site-config'
 import styles from './page.module.css'
 
@@ -8,6 +9,7 @@ export default async function Home() {
 
   return (
     <div className={styles.landing}>
+      <LotusMandala className={styles.lotus} />
       <div className={styles.themeToggleWrap}>
         <ThemeToggle />
       </div>
@@ -26,10 +28,6 @@ export default async function Home() {
           <Link href="/works" className={styles.link}>
             <span className={styles.icon}>◈</span>
             <span className={styles.label}>Works</span>
-          </Link>
-          <Link href="/india-ai" className={styles.link}>
-            <span className={styles.icon}>AI</span>
-            <span className={styles.label}>AI</span>
           </Link>
           <Link href="/about" className={styles.link}>
             <span className={styles.icon}>@</span>

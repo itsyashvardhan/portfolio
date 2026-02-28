@@ -9,6 +9,33 @@
     background-color: var(--color-bg);
 }
 
+/* Lotus mandala — decorative background */
+.lotus {
+    position: absolute;
+    top: clamp(-220px, -18vw, -120px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(122vw, 1100px);
+    height: auto;
+    color: var(--color-text-tertiary);
+    opacity: 0;
+    animation: lotusReveal 1.5s ease-in-out 0.5s forwards;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes lotusReveal {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
 
 .content {
     display: flex;
@@ -182,6 +209,13 @@
 @media (max-width: 640px) {
     .landing {
         padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .lotus {
+        /* Render the full mandala on mobile, as it serves as a key visual element. */
+        top: 5%;
+        transform: translateX(-50%, -50%);
+        width: 100vw;
     }
 
     .themeToggleWrap {
