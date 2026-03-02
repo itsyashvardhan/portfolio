@@ -22,6 +22,9 @@
     animation: lotusReveal 1.5s ease-in-out 0.5s forwards;
     pointer-events: none;
     z-index: 0;
+    /* Soften the visible slice edge instead of a hard viewport cut. */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 14%, #000 30%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 14%, #000 30%, #000 100%);
 }
 
 @keyframes lotusReveal {
@@ -118,7 +121,7 @@
     font-size: 1.04rem;
     font-weight: 400;
     color: color-mix(in srgb, var(--color-text), transparent 28%);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     margin-top: 12px;
     font-style: italic;
     opacity: 0;
@@ -130,7 +133,7 @@
     display: flex;
     justify-content: center;
     gap: 56px;
-    margin-top: 36px;
+    margin-top: 28px;
     position: relative;
     animation: navEntrance 760ms ease-out 180ms forwards;
     opacity: 0;
@@ -214,8 +217,10 @@
     .lotus {
         /* Render the full mandala on mobile, as it serves as a key visual element. */
         top: 5%;
-        transform: translateX(-50%, -50%);
+        transform: translateX(-50%);
         width: 100vw;
+        -webkit-mask-image: none;
+        mask-image: none;
     }
 
     .themeToggleWrap {
