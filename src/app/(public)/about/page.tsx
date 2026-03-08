@@ -10,18 +10,27 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'About',
-    description: 'Product Manager & Solutions Engineer specializing in AI solutions, analytics, and project management.',
+    description: 'Yashvardhan is an analyst focused on data, AI, systems, and customer-facing problem solving.',
 }
 
 export default async function AboutPage() {
     const { profile, experiences, skills, education, achievements, socialLinks } = await getAboutPageData()
+    const profileImageSrc = normalizeProfileImageUrl(profile?.profile_image)
+    const skillSections = [
+        { key: 'languages', title: 'Languages', items: skills.languages },
+        { key: 'analytics', title: 'Analytics', items: skills.analytics },
+        { key: 'databases', title: 'Databases', items: skills.databases },
+        { key: 'devops', title: 'DevOps', items: skills.devops },
+        { key: 'cloud', title: 'Cloud', items: skills.cloud },
+        { key: 'general', title: 'General', items: skills.general },
+    ].filter((section) => section.items.length > 0)
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return 'Present'
         return new Date(dateStr).getFullYear().toString()
     }
 
-    const hasSkills = Object.values(skills).some(arr => arr.length > 0)
+    const hasSkills = skillSections.length > 0
 
     return (
         <div className={styles.page}>
@@ -30,14 +39,15 @@ export default async function AboutPage() {
                 <div className="container">
                     <div className={styles.hero}>
                         {/* Profile Image - Only show if exists */}
-                        {profile?.profile_image && (
+                        {profileImageSrc && (
                             <div className={styles.avatar}>
                                 <Image
-                                    src={profile.profile_image}
-                                    alt={profile.name}
+                                    src={profileImageSrc}
+                                    alt={profile?.name || 'Profile Image'}
                                     width={120}
                                     height={120}
                                     className={styles.avatarImage}
+                                    unoptimized={profileImageSrc.includes('drive.google.com')}
                                 />
                             </div>
                         )}
@@ -103,60 +113,16 @@ export default async function AboutPage() {
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>Skills</h2>
                             <div className={styles.skillsGrid}>
-                                {skills.tools.length > 0 && (
-                                    <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Tools & Platforms</h3>
+                                {skillSections.map((section) => (
+                                    <div key={section.key} className={styles.skillCategory}>
+                                        <h3 className={styles.skillCategoryTitle}>{section.title}</h3>
                                         <div className={styles.skillTags}>
-                                            {skills.tools.map((skill) => (
+                                            {section.items.map((skill) => (
                                                 <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
                                             ))}
                                         </div>
                                     </div>
-                                )}
-
-                                {skills.frameworks.length > 0 && (
-                                    <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Frameworks & Methods</h3>
-                                        <div className={styles.skillTags}>
-                                            {skills.frameworks.map((skill) => (
-                                                <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {skills.languages.length > 0 && (
-                                    <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Technical Skills</h3>
-                                        <div className={styles.skillTags}>
-                                            {skills.languages.map((skill) => (
-                                                <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {skills['soft-skills'].length > 0 && (
-                                    <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Core Competencies</h3>
-                                        <div className={styles.skillTags}>
-                                            {skills['soft-skills'].map((skill) => (
-                                                <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {skills.general.length > 0 && (
-                                    <div className={styles.skillCategory}>
-                                        <h3 className={styles.skillCategoryTitle}>Domain Expertise</h3>
-                                        <div className={styles.skillTags}>
-                                            {skills.general.map((skill) => (
-                                                <span key={skill.id} className={styles.skillTag}>{skill.name}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                ))}
                             </div>
                         </section>
                     )}
@@ -218,7 +184,7 @@ export default async function AboutPage() {
                     <section className={`${styles.section} ${styles.contactSection}`}>
                         <h2 className={styles.sectionTitle}>Get in Touch</h2>
                         <p className={styles.contactIntro}>
-                            Open to product, analytics, and solutions engineering roles.
+                            Open to Data Analyst and Data & AI roles across Asia and Europe. Available from mid-2026.
                         </p>
                         <div className={styles.socialLinks}>
                             {socialLinks.map((link) => (
@@ -250,6 +216,17 @@ export default async function AboutPage() {
             </div>
         </div>
     )
+}
+
+function normalizeProfileImageUrl(url?: string | null): string | null {
+    if (!url) return null
+
+    const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
+    if (driveMatch?.[1]) {
+        return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`
+    }
+
+    return url
 }
 
 // Social Icons Helper

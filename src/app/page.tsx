@@ -9,7 +9,10 @@ export default async function Home() {
 
   return (
     <div className={styles.landing}>
-      <LotusMandala className={styles.lotus} />
+      <LotusMandala className={styles.lotusTL} />
+      <LotusMandala className={styles.lotusTR} />
+      <LotusMandala className={styles.lotusBL} />
+      <LotusMandala className={styles.lotusBR} />
       <div className={styles.themeToggleWrap}>
         <ThemeToggle />
       </div>

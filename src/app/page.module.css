@@ -7,35 +7,55 @@
     overflow: hidden;
     position: relative;
     background-color: var(--color-bg);
+    --lotus-size: clamp(560px, 78vmax, 1320px);
 }
 
 /* Lotus mandala — decorative background */
-.lotus {
+.lotusTL,
+.lotusTR,
+.lotusBL,
+.lotusBR {
     position: absolute;
-    top: clamp(-220px, -18vw, -120px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(122vw, 1100px);
+    width: var(--lotus-size);
     height: auto;
-    color: var(--color-text-tertiary);
+    color: color-mix(in srgb, var(--color-text-tertiary), transparent 42%);
     opacity: 0;
-    animation: lotusReveal 1.5s ease-in-out 0.5s forwards;
+    animation: lotusFade 3s ease-in-out 0.2s forwards;
     pointer-events: none;
     z-index: 0;
-    /* Soften the visible slice edge instead of a hard viewport cut. */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 14%, #000 30%, #000 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 14%, #000 30%, #000 100%);
 }
 
-@keyframes lotusReveal {
+.lotusTL {
+    top: 0;
+    left: 0;
+    transform: translate(-50%,0%) rotate(180deg);
+}
+
+.lotusTR {
+    top: 0;
+    right: 0;
+    transform: translate(50%, 0%) rotate(180deg);
+}
+
+.lotusBL {
+    bottom: 0;
+    left: 0;
+    transform: translate(-25%, 50%) rotate(90deg);
+}
+
+.lotusBR {
+    bottom: 0;
+    right: 0;
+    transform: translate(25%, 50%) rotate(270deg);
+}
+
+@keyframes lotusFade {
     from {
         opacity: 0;
-        transform: translateX(-50%) scale(0.92);
     }
 
     to {
         opacity: 1;
-        transform: translateX(-50%) scale(1);
     }
 }
 
@@ -49,7 +69,7 @@
     z-index: 1;
     width: min(92vw, 760px);
     max-width: 760px;
-    min-height: 42dvh;
+    min-height: 48dvh;
 }
 
 .themeToggleWrap {
@@ -212,15 +232,14 @@
 @media (max-width: 640px) {
     .landing {
         padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+        --lotus-size: clamp(460px, 120vmax, 980px);
     }
 
-    .lotus {
-        /* Render the full mandala on mobile, as it serves as a key visual element. */
-        top: 5%;
-        transform: translateX(-50%);
-        width: 100vw;
-        -webkit-mask-image: none;
-        mask-image: none;
+    .lotusTL,
+    .lotusTR,
+    .lotusBL,
+    .lotusBR {
+        opacity: 0.9;
     }
 
     .themeToggleWrap {

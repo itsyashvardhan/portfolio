@@ -24,8 +24,10 @@ export function LotusMandala({ className }: { className?: string }) {
                         <path
                             d="M0,-50 C30,-110 55,-200 0,-300 C-55,-200 -30,-110 0,-50Z"
                             stroke="currentColor"
-                            strokeWidth="0.9"
-                            opacity="0.25"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            opacity="0.34"
                             fill="none"
                         />
                     </g>

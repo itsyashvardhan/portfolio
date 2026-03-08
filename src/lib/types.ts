@@ -99,7 +99,16 @@ export interface Experience {
 export interface Skill {
     id: string
     name: string
-    category: 'languages' | 'frameworks' | 'tools' | 'soft-skills' | 'general'
+    category:
+        | 'languages'
+        | 'analytics'
+        | 'databases'
+        | 'devops'
+        | 'cloud'
+        | 'general'
+        | 'frameworks'
+        | 'tools'
+        | 'soft-skills'
     proficiency: number
     display_order: number
     created_at: string
@@ -107,10 +116,14 @@ export interface Skill {
 
 export interface SkillsByCategory {
     languages: Skill[]
+    analytics: Skill[]
+    databases: Skill[]
+    devops: Skill[]
+    cloud: Skill[]
+    general: Skill[]
     frameworks: Skill[]
     tools: Skill[]
     'soft-skills': Skill[]
-    general: Skill[]
 }
 
 // Education Types

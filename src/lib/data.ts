@@ -252,19 +252,27 @@ export async function getSkills(): Promise<SkillsByCategory> {
 
         return {
             languages: allSkills.filter(s => s.category === 'languages'),
+            analytics: allSkills.filter(s => s.category === 'analytics'),
+            databases: allSkills.filter(s => s.category === 'databases'),
+            devops: allSkills.filter(s => s.category === 'devops'),
+            cloud: allSkills.filter(s => s.category === 'cloud'),
+            general: allSkills.filter(s => s.category === 'general'),
             frameworks: allSkills.filter(s => s.category === 'frameworks'),
             tools: allSkills.filter(s => s.category === 'tools'),
             'soft-skills': allSkills.filter(s => s.category === 'soft-skills'),
-            general: allSkills.filter(s => s.category === 'general'),
         }
     } catch (e) {
         console.error('Error fetching skills:', e)
         return {
             languages: [],
+            analytics: [],
+            databases: [],
+            devops: [],
+            cloud: [],
+            general: [],
             frameworks: [],
             tools: [],
             'soft-skills': [],
-            general: [],
         }
     }
 }
