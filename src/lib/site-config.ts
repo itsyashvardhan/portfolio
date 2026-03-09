@@ -1,4 +1,5 @@
 import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 import { db } from '@/lib/db'
 import { settings } from '@/lib/db/schema'
 
@@ -16,7 +17,7 @@ export interface SiteConfig {
     logoText: string
 }
 
-const DEFAULT_SITE_CONFIG: SiteConfig = {
+export const DEFAULT_SITE_CONFIG: SiteConfig = {
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com',
     ownerName: process.env.NEXT_PUBLIC_OWNER_NAME || 'Your Name',
     ownerTitle: process.env.NEXT_PUBLIC_OWNER_TITLE || 'Software Engineer',
@@ -52,18 +53,37 @@ function mapSettingsToConfig(settingsMap: Record<string, string>): SiteConfig {
     }
 }
 
+export function getStaticSiteConfig(): SiteConfig {
+    return DEFAULT_SITE_CONFIG
+}
+
+const loadSiteConfig = unstable_cache(
+    async (): Promise<SiteConfig> => {
+        try {
+            const rows = await db
+                .select({ key: settings.key, value: settings.value })
+                .from(settings)
+
+            const settingsMap = rows.reduce<Record<string, string>>((acc, row) => {
+                acc[row.key] = row.value
+                return acc
+            }, {})
+
+            return mapSettingsToConfig(settingsMap)
+        } catch (error) {
+            console.error('Error fetching site config from settings:', error)
+            return DEFAULT_SITE_CONFIG
+        }
+    },
+    ['site-config'],
+    {
+        revalidate: 300,
+    }
+)
+
 export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
     try {
-        const rows = await db
-            .select({ key: settings.key, value: settings.value })
-            .from(settings)
-
-        const settingsMap = rows.reduce<Record<string, string>>((acc, row) => {
-            acc[row.key] = row.value
-            return acc
-        }, {})
-
-        return mapSettingsToConfig(settingsMap)
+        return await loadSiteConfig()
     } catch (error) {
         console.error('Error fetching site config from settings:', error)
         return DEFAULT_SITE_CONFIG

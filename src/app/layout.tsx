@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, DotGothic16 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ConsoleMessage } from "./console-message";
-import { getSiteConfig } from "@/lib/site-config";
+import { getStaticSiteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,8 +29,8 @@ export const viewport: Viewport = {
   ],
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const site = await getSiteConfig();
+export function generateMetadata(): Metadata {
+  const site = getStaticSiteConfig();
   const siteUrl = site.siteUrl;
   const ownerName = site.ownerName;
   const ownerTitle = site.ownerTitle;
@@ -122,12 +122,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const site = await getSiteConfig();
+  const site = getStaticSiteConfig();
   const themeInitScript = `
     (() => {
       try {

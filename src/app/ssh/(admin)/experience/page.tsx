@@ -10,6 +10,7 @@ interface Experience {
     role: string
     start_date: string | null
     end_date: string | null
+    location: string | null
     highlights: string[]
     display_order: number
 }
@@ -23,6 +24,7 @@ export default function AdminExperiencePage() {
         role: '',
         start_date: '',
         end_date: '',
+        location: '',
         highlights: '',
         display_order: 0,
     })
@@ -43,6 +45,7 @@ export default function AdminExperiencePage() {
             role: '',
             start_date: '',
             end_date: '',
+            location: '',
             highlights: '',
             display_order: experiences.length,
         })
@@ -55,6 +58,7 @@ export default function AdminExperiencePage() {
             role: exp.role,
             start_date: exp.start_date || '',
             end_date: exp.end_date || '',
+            location: exp.location || '',
             highlights: exp.highlights?.join('\n') || '',
             display_order: exp.display_order,
         })
@@ -69,6 +73,7 @@ export default function AdminExperiencePage() {
             role: formData.role,
             start_date: formData.start_date || null,
             end_date: formData.end_date || null,
+            location: formData.location || null,
             highlights: formData.highlights.split('\n').map(h => h.trim()).filter(Boolean),
             display_order: formData.display_order,
         }
@@ -91,8 +96,15 @@ export default function AdminExperiencePage() {
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return 'Present'
-        const date = new Date(dateStr)
-        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        const [year, month] = dateStr.split('-')
+        const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const monthIndex = Number(month) - 1
+
+        if (!year || Number.isNaN(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+            return dateStr
+        }
+
+        return `${monthLabels[monthIndex]} ${year}`
     }
 
     if (loading) return <p>Loading...</p>
@@ -149,6 +161,17 @@ export default function AdminExperiencePage() {
                 </div>
 
                 <div className={styles.field}>
+                    <label className={styles.label}>Location</label>
+                    <input
+                        type="text"
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        className={styles.input}
+                        placeholder="Remote, Bengaluru, India, etc."
+                    />
+                </div>
+
+                <div className={styles.field}>
                     <label className={styles.label}>Display Order</label>
                     <input
                         type="number"
@@ -193,7 +216,9 @@ export default function AdminExperiencePage() {
                                 <div>
                                     <h3 className={styles.itemTitle}>{exp.role}</h3>
                                     <p className={styles.itemSubtitle}>
-                                        {exp.organization} • {formatDate(exp.start_date)} - {formatDate(exp.end_date)}
+                                        {exp.organization}
+                                        {exp.location ? ` • ${exp.location}` : ''}
+                                        {` • ${formatDate(exp.start_date)} - ${formatDate(exp.end_date)}`}
                                     </p>
                                 </div>
                                 <span className={styles.order}>#{exp.display_order}</span>

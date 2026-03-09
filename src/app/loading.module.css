@@ -24,17 +24,84 @@
     padding: var(--space-5);
 }
 
-.spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid var(--color-border);
-    border-top-color: var(--color-text-tertiary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+.wordmark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
+.wordmarkText {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(4rem, 8vw, 6.5rem);
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    line-height: 0.9;
+    color: color-mix(in srgb, var(--color-text), rgb(0, 0, 0) 40%);
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    text-shadow: 0 0 0.01px currentColor, 0 0 18px color-mix(in srgb, #000000, transparent 100%);
+}
+
+.wordmarkShine {
+    position: absolute;
+    inset: -18% -12%;
+    background: linear-gradient(
+        108deg,
+        rgba(255, 245, 224, 0) 0%,
+        rgba(255, 230, 174, 0) 38%,
+        rgba(255, 235, 192, 0.75) 48%,
+        rgba(255, 218, 142, 0.28) 54%,
+        rgba(255, 245, 224, 0) 64%,
+        rgba(255, 245, 224, 0) 100%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    transform: translateX(-160%) skewX(-16deg);
+    animation: shineSweep 3.8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+@keyframes strobeGlow {
+    0% {
+        opacity: 0.82;
+        text-shadow: 0 0 0.01px currentColor, 0 0 10px color-mix(in srgb, #caa15a, transparent 96%);
+    }
+
+    18% {
+        opacity: 1;
+        text-shadow: 0 0 0.01px currentColor, 0 0 22px color-mix(in srgb, #d6b06b, transparent 84%);
+    }
+
+    52% {
+        opacity: 1;
+        text-shadow: 0 0 0.01px currentColor, 0 0 18px color-mix(in srgb, #caa15a, transparent 88%);
+    }
+
+    100% {
+        opacity: 0.82;
+        text-shadow: 0 0 0.01px currentColor, 0 0 10px color-mix(in srgb, #caa15a, transparent 96%);
+    }
+}
+
+@keyframes shineSweep {
+    0% {
+        transform: translateX(-160%) skewX(-16deg);
+        opacity: 0;
+    }
+
+    18% {
+        opacity: 0.18;
+    }
+
+    44% {
+        transform: translateX(0%) skewX(-16deg);
+        opacity: 0.9;
+    }
+
+    100% {
+        transform: translateX(160%) skewX(-16deg);
+        opacity: 0;
     }
 }

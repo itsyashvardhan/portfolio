@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LotusMandala } from '@/components/lotus-mandala'
-import { getSiteConfig } from '@/lib/site-config'
+import { getStaticSiteConfig } from '@/lib/site-config'
 import styles from './page.module.css'
 
-export default async function Home() {
-  const site = await getSiteConfig()
+export default function Home() {
+  const site = getStaticSiteConfig()
 
   return (
     <div className={styles.landing}>
@@ -28,7 +28,7 @@ export default async function Home() {
             <span className={styles.icon}>¶</span>
             <span className={styles.label}>Blog</span>
           </Link>
-          <Link href="/works" className={styles.link}>
+          <Link href="/works" className={`${styles.link} ${styles.linkPrimary}`}>
             <span className={styles.icon}>◈</span>
             <span className={styles.label}>Works</span>
           </Link>

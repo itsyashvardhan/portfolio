@@ -90,6 +90,7 @@ export interface Experience {
     role: string
     start_date: string | null
     end_date: string | null
+    location: string | null
     highlights: string[]
     display_order: number
     created_at: string

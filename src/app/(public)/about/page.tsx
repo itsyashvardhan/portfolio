@@ -27,7 +27,15 @@ export default async function AboutPage() {
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return 'Present'
-        return new Date(dateStr).getFullYear().toString()
+        const [year, month] = dateStr.split('-')
+        const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const monthIndex = Number(month) - 1
+
+        if (!year || Number.isNaN(monthIndex) || monthIndex < 0 || monthIndex > 11) {
+            return dateStr
+        }
+
+        return `${monthLabels[monthIndex]} ${year}`
     }
 
     const hasSkills = skillSections.length > 0
@@ -90,6 +98,9 @@ export default async function AboutPage() {
                                             <div>
                                                 <h3 className={styles.company}>{exp.organization}</h3>
                                                 <p className={styles.expRole}>{exp.role}</p>
+                                                {exp.location && (
+                                                    <p className={styles.location}>{exp.location}</p>
+                                                )}
                                             </div>
                                             <span className={styles.duration}>
                                                 {formatDate(exp.start_date)} — {formatDate(exp.end_date)}
@@ -183,9 +194,6 @@ export default async function AboutPage() {
                     {/* Contact Section */}
                     <section className={`${styles.section} ${styles.contactSection}`}>
                         <h2 className={styles.sectionTitle}>Get in Touch</h2>
-                        <p className={styles.contactIntro}>
-                            Open to Data Analyst and Data & AI roles across Asia and Europe. Available from mid-2026.
-                        </p>
                         <div className={styles.socialLinks}>
                             {socialLinks.map((link) => (
                                 <a
