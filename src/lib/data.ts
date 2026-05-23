@@ -76,6 +76,20 @@ export async function getBlogList(options?: {
 
         const total = countResult[0]?.count || 0
 
+        if (articles.length === 0) {
+            const filtered = tag
+                ? fallbackBlogListItems.filter((item) => item.tags.includes(tag))
+                : fallbackBlogListItems
+            const paginated = filtered.slice(offset, offset + limit)
+            return {
+                articles: paginated,
+                total: filtered.length,
+                page,
+                limit,
+                hasMore: filtered.length > page * limit,
+            }
+        }
+
         return {
             articles: articles as BlogListItem[],
             total,
@@ -108,7 +122,7 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
             .where(and(eq(blog.slug, slug), eq(blog.status, 'published')))
             .limit(1)
 
-        return (result as Blog) || null
+        return (result as Blog) || fallbackBlogPosts.find((post) => post.slug === slug) || null
     } catch (e) {
         console.error('Error fetching blog by slug:', e)
         return fallbackBlogPosts.find((post) => post.slug === slug) || null

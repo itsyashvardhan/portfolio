@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getBlogBySlug } from '@/lib/data'
+import { fallbackBlogPosts } from '@/lib/fallback-content'
 
 function stripMarkdown(md: string): string {
     return md
@@ -75,7 +76,7 @@ export async function GET(
         return NextResponse.json({ error: 'TTS not configured' }, { status: 503 })
     }
 
-    const article = await getBlogBySlug(slug)
+    const article = await getBlogBySlug(slug) ?? fallbackBlogPosts.find(p => p.slug === slug) ?? null
     if (!article) {
         return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }

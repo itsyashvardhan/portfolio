@@ -36,8 +36,15 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     h3: ({ children }) => <h3 className={styles.h3}>{children}</h3>,
                     h4: ({ children }) => <h4 className={styles.h4}>{children}</h4>,
 
-                    // Paragraphs
-                    p: ({ children }) => <p className={styles.p}>{children}</p>,
+                    // Paragraphs — use div when children contain block-level components (e.g. figure)
+                    p: ({ children }) => {
+                        const hasBlock = React.Children.toArray(children).some(
+                            (child) => React.isValidElement(child) && typeof child.type !== 'string'
+                        )
+                        return hasBlock
+                            ? <div className={styles.p}>{children}</div>
+                            : <p className={styles.p}>{children}</p>
+                    },
 
                     // Links
                     a: ({ href, children }) => (
