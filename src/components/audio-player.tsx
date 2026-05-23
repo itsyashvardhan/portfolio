@@ -175,7 +175,7 @@ export function AudioPlayer({ slug }: AudioPlayerProps) {
 
             {/* Voice tag */}
             <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
-                {state === 'error' ? '' : 'Gemini · Kore'}
+                {state === 'error' ? '' : 'AI · audio'}
             </span>
         </div>
     )
