@@ -7,9 +7,7 @@ export const fallbackBlogPosts: Blog[] = [
         id: 'fallback-blog-1',
         slug: 'vision-encoder-optimization-edge-vllm',
         title: 'Vision Encoder Optimization for Edge Visual LLMs',
-        body: `![VLLMArchitect research dashboard showing the vision encoder optimization framework accepted at ICCCN 2026](/blog/vllm-hero.png)
-
-This is the research I published at ICCCN 2026 in Manchester. The core question I was investigating: when you deploy a visual LLM on edge hardware, where does the latency actually come from? The answer surprised me, and it changes how you should think about model selection entirely.
+        body: `This is the research I published at ICCCN 2026 in Manchester. The core question I was investigating: when you deploy a visual LLM on edge hardware, where does the latency actually come from? The answer surprised me, and it changes how you should think about model selection entirely.
 
 ## The Sensory Bottleneck
 
@@ -17,32 +15,32 @@ The common assumption is that the language model decoder is the expensive part o
 
 Across my benchmarks, the encoder accounted for 70 to 85 percent of Time-to-First-Token (TTFT). The LLM portion, which everyone obsesses over, was secondary. I'm calling this the **Sensory Bottleneck Hypothesis**: the image tokenisation stage, not the autoregressive decoder, determines the real-time viability of edge VLLM deployments.
 
-The full pipeline looks like this:
+The full pipeline breaks down like this:
 
-**TTFT = L_enc + L_proj + L_prefill(T)**
+![Edge VLLM Inference Pipeline: Input Processing, Vision Encoder as primary bottleneck, Projector, LLM Decoder. TTFT = L_enc + L_proj + L_prefill(T)](/blog/vllm-pipeline.svg)
 
-Where L_enc is encoder latency (the bottleneck), L_proj is the projector that aligns encoder embeddings with LLM space, and T is the visual token count passed to the prefill stage.
-
-![The edge VLLM inference pipeline showing input processing, vision encoder, projector, and LLM decoder stages](/blog/vllm-pipeline.png)
+**TTFT = L_enc + L_proj + L_prefill(T)** where L_enc is encoder latency (the bottleneck, 1.6ms to 98ms), L_proj is the projector aligning encoder embeddings with LLM space (15-80ms), and T is the visual token count passed to prefill.
 
 ## What I Benchmarked
 
-I ran 8 vision encoder architectures across 4 hardware platforms: Raspberry Pi 5, Raspberry Pi 5 with Google Coral TPU, NVIDIA Jetson Orin Nano, and iPhone 15 Pro. Every number below is averaged over 100 inference passes with a 10-pass warm-up, with variance under 8%.
+I ran 8 vision encoder architectures across 4 hardware platforms: Raspberry Pi 5, Raspberry Pi 5 with Google Coral TPU, NVIDIA Jetson Orin Nano, and iPhone 15 Pro. Every number below is averaged over 100 inference passes with a 10-pass warm-up, variance under 8%.
 
 | Backbone | Platform | Precision | Latency (ms) | Accuracy |
 |---|---|---|---|---|
 | EfficientNet-B0 | Raspberry Pi 5 | TFLite INT8 | 28-32 | 77.1% |
-| EfficientNet-B3 | Jetson Orin Nano | TensorRT FP16 | 14.2 | 81.6% |
+| EfficientNet-B3 | Jetson Orin Nano | TensorRT FP16 | **14.2** | **81.6%** |
 | EfficientNet-B4 | Jetson Orin Nano | TensorRT FP16 | 48.5 | 82.9% |
 | MobileNetV3 | Legacy Pi 4 | TFLite INT8 | 42-56 | 75.2% |
 | MobileViT-XS | iPhone 15 Pro | CoreML NPU | 7.2 | 78.9% |
 | ViT-Base/16 | Jetson Orin Nano | TensorRT FP16 | 98.0 | 81.0% |
-| FastViT-HD | Jetson Orin Nano | TensorRT FP16 | 18.5 | 82.2% |
-| EfficientFormer-L1 | RPi 5 + Coral TPU | TFLite + NNAPI | 1.6 | 79.2% |
+| FastViT-HD | Jetson Orin Nano | TensorRT FP16 | **18.5** | **82.2%** |
+| EfficientFormer-L1 | RPi 5 + Coral TPU | TFLite + NNAPI | **1.6** | 79.2% |
 
-That EfficientFormer-L1 number is the one that stuck with me: **1.6 ms** on a Coral TPU, 79.2% accuracy. ViT-Base gets 81.0% accuracy on a Jetson at **98 ms**. You're trading 60x latency for 1.8 percentage points.
+That EfficientFormer-L1 number is the one that stuck with me: **1.6 ms** on a Coral TPU, 79.2% accuracy. ViT-Base gets 81.0% accuracy on a Jetson at **98 ms**. You're trading 60x the latency for 1.8 percentage points. The chart below shows all 8 models plotted on the Pareto frontier:
 
-![Full benchmark results table across 8 architectures and 4 edge hardware platforms](/blog/vllm-benchmarks.png)
+![Latency-Accuracy Pareto Frontier scatter plot: 8 vision encoders benchmarked across edge platforms. Hybrid models (green triangles) dominate the real-time regime. Cache Cliff visible between EfficientNet-B3 and B4.](/blog/pareto-chart.svg)
+
+EfficientNet-B3 and FastViT-HD sit on the Pareto frontier. EfficientNet-B4 falls off it entirely, which is where the Cache Cliff becomes visible.
 
 ## The Cache Cliff
 

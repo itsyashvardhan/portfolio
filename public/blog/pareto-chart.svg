@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Latency-Accuracy Pareto Frontier: 8 vision encoders benchmarked across edge hardware" width="1150" height="430" viewBox="0 0 1150 430" style="width:100%;height:auto;display:block;border-radius:8px;">
+  <!-- Background -->
+  <rect width="1150" height="430" fill="#0f172a" rx="8"/>
+  <!-- Title -->
+  <text x="600" y="28" font-size="13" font-family="monospace" fill="#94a3b8" text-anchor="middle" font-weight="bold">Latency-Accuracy Pareto Frontier · ICCCN 2026 Benchmark</text>
+  <!-- Grid lines horizontal -->
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="80" y1="350" x2="1120" y2="350"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="80" y1="271.6" x2="1120" y2="271.6"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="80" y1="193.2" x2="1120" y2="193.2"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="80" y1="114.8" x2="1120" y2="114.8"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="80" y1="56" x2="1120" y2="56"/>
+  <!-- Grid lines vertical -->
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="80" y1="56" x2="80" y2="350"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="340" y1="56" x2="340" y2="350"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="600" y1="56" x2="600" y2="350"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="860" y1="56" x2="860" y2="350"/>
+  <line stroke-dasharray="3 3" stroke="rgba(255,255,255,0.06)" x1="1120" y1="56" x2="1120" y2="350"/>
+  <!-- Regime reference lines -->
+  <line stroke="rgba(16,185,129,0.35)" stroke-dasharray="4 4" x1="158" y1="56" x2="158" y2="350"/>
+  <line stroke="rgba(6,182,212,0.35)" stroke-dasharray="4 4" x1="340" y1="56" x2="340" y2="350"/>
+  <!-- Regime labels -->
+  <text x="158" y="50" font-size="10" fill="rgba(16,185,129,0.8)" font-family="monospace" text-anchor="middle">Real-time (&lt;15ms)</text>
+  <text x="340" y="50" font-size="10" fill="rgba(6,182,212,0.8)" font-family="monospace" text-anchor="middle">Interactive (&lt;50ms)</text>
+  <!-- Axes -->
+  <line stroke="rgba(255,255,255,0.15)" x1="80" y1="350" x2="1120" y2="350"/>
+  <line stroke="rgba(255,255,255,0.15)" x1="80" y1="56" x2="80" y2="350"/>
+  <!-- X axis ticks -->
+  <text x="80" y="368" font-size="11" fill="#64748b" font-family="monospace" text-anchor="middle">0 ms</text>
+  <text x="340" y="368" font-size="11" fill="#64748b" font-family="monospace" text-anchor="middle">50 ms</text>
+  <text x="600" y="368" font-size="11" fill="#64748b" font-family="monospace" text-anchor="middle">100 ms</text>
+  <text x="860" y="368" font-size="11" fill="#64748b" font-family="monospace" text-anchor="middle">150 ms</text>
+  <text x="1120" y="368" font-size="11" fill="#64748b" font-family="monospace" text-anchor="middle">200 ms</text>
+  <text x="600" y="390" font-size="12" fill="#64748b" font-family="monospace" text-anchor="middle">Encoder Latency (ms) — Lower is Better</text>
+  <!-- Y axis ticks -->
+  <text x="72" y="354" font-size="11" fill="#64748b" font-family="monospace" text-anchor="end">70%</text>
+  <text x="72" y="275" font-size="11" fill="#64748b" font-family="monospace" text-anchor="end">74%</text>
+  <text x="72" y="197" font-size="11" fill="#64748b" font-family="monospace" text-anchor="end">78%</text>
+  <text x="72" y="118" font-size="11" fill="#64748b" font-family="monospace" text-anchor="end">82%</text>
+  <text x="72" y="60" font-size="11" fill="#64748b" font-family="monospace" text-anchor="end">85%</text>
+  <text transform="rotate(-90,22,203)" x="22" y="203" font-size="12" fill="#64748b" font-family="monospace" text-anchor="middle">ImageNet Top-1 Accuracy (%)</text>
+
+  <!-- CNN group (circles, slate) -->
+  <!-- EfficientNet-B0: 30ms, 77.1% -->
+  <circle cx="236" cy="210" r="7" fill="#cbd5e1"/>
+  <text x="248" y="207" font-size="10" fill="#94a3b8" font-family="monospace">EfficientNet-B0 (30ms, 77.1%)</text>
+  <!-- EfficientNet-B3: 14.2ms, 81.6% — Pareto optimal -->
+  <circle cx="153" cy="123" r="9" fill="#10b981"/>
+  <text x="167" y="117" font-size="10" fill="#10b981" font-family="monospace" font-weight="bold">EfficientNet-B3 ★ (14.2ms, 81.6%)</text>
+  <!-- EfficientNet-B4: 48.5ms, 82.9% — Cache Cliff! -->
+  <circle cx="332" cy="97" r="7" fill="#f87171"/>
+  <text x="344" y="92" font-size="10" fill="#f87171" font-family="monospace">EfficientNet-B4 ⚠ CACHE CLIFF (48.5ms, 82.9%)</text>
+  <!-- MobileNetV3: 49ms, 75.2% -->
+  <circle cx="334" cy="248" r="7" fill="#cbd5e1"/>
+  <text x="346" y="244" font-size="10" fill="#94a3b8" font-family="monospace">MobileNetV3 (49ms, 75.2%)</text>
+
+  <!-- Hybrid group (triangles, green) -->
+  <!-- MobileViT-XS: 7.2ms, 78.9% -->
+  <path d="M117,168 L124,181 L110,181 Z" fill="#10b981"/>
+  <text x="88" y="163" font-size="10" fill="#10b981" font-family="monospace">MobileViT-XS (7.2ms, 78.9%)</text>
+  <!-- EfficientFormer-L1: 1.6ms, 79.2% -->
+  <path d="M88,162 L95,175 L81,175 Z" fill="#10b981"/>
+  <text x="98" y="175" font-size="10" fill="#10b981" font-family="monospace">EfficientFormer-L1 ★ (1.6ms, 79.2%)</text>
+  <!-- FastViT-HD: 18.5ms, 82.2% -->
+  <path d="M176,103 L183,116 L169,116 Z" fill="#10b981"/>
+  <text x="188" y="111" font-size="10" fill="#10b981" font-family="monospace" font-weight="bold">FastViT-HD ★ (18.5ms, 82.2%)</text>
+
+  <!-- ViT star (amber) -->
+  <!-- ViT-Base: 98ms, 81.0% -->
+  <path d="M590,127 L592,133 L598,133 L593,137 L595,143 L590,139 L585,143 L587,137 L582,133 L588,133 Z" fill="#f59e0b"/>
+  <text x="602" y="131" font-size="10" fill="#f59e0b" font-family="monospace">ViT-Base/16 (98ms, 81.0%)</text>
+
+  <!-- Full pipeline diamond (purple) -->
+  <!-- MobileVLM-1.7B: 183ms avg, 72.5% -->
+  <path d="M1032,294 L1039,301 L1032,308 L1025,301 Z" fill="#8b5cf6"/>
+  <text x="960" y="285" font-size="10" fill="#8b5cf6" font-family="monospace">MobileVLM-1.7B (183ms, 72.5%)</text>
+
+  <!-- Cache cliff annotation arrow -->
+  <line x1="190" y1="110" x2="153" y2="123" stroke="#f87171" stroke-width="1" stroke-dasharray="2 2" marker-end="url(#arr)"/>
+  <text x="195" y="107" font-size="9" fill="#f87171" font-family="monospace">3.4× latency jump for +1.3% acc</text>
+  <line x1="332" y1="97" x2="332" y2="135" stroke="#f87171" stroke-width="1" stroke-dasharray="2 2"/>
+
+  <!-- Legend -->
+  <rect x="82" y="380" width="10" height="10" rx="5" fill="#cbd5e1"/>
+  <text x="96" y="390" font-size="10" fill="#94a3b8" font-family="monospace">CNN (EfficientNet / MobileNet)</text>
+  <path d="M200,385 L205,395 L195,395 Z" fill="#10b981"/>
+  <text x="210" y="390" font-size="10" fill="#10b981" font-family="monospace">Hybrid (MobileViT / FastViT)</text>
+  <path d="M340,382 L342,388 L348,388 L343,392 L345,398 L340,394 L335,398 L337,392 L332,388 L338,388 Z" fill="#f59e0b"/>
+  <text x="353" y="390" font-size="10" fill="#f59e0b" font-family="monospace">Pure ViT</text>
+  <rect x="430" y="382" width="10" height="10" rx="2" fill="#f87171" opacity="0.8"/>
+  <text x="444" y="390" font-size="10" fill="#f87171" font-family="monospace">Cache Cliff boundary</text>
+  <text x="82" y="418" font-size="9" fill="#475569" font-family="monospace">Source: Table II, ICCCN 2026 · Platforms: RPi 5, Jetson Orin Nano, Coral TPU, iPhone 15 Pro · Pareto: EfficientNet-B3 &amp; FastViT-HD</text>
+</svg>
