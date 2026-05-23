@@ -7,20 +7,34 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
     return {
         rules: [
+            // Search engines — full access
+            {
+                userAgent: ['Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot'],
+                allow: '/',
+                disallow: ['/api/', '/auth/', '/ssh/', '/verify/'],
+            },
+            // AI training crawlers — blog metadata only
+            {
+                userAgent: [
+                    'GPTBot',
+                    'ChatGPT-User',
+                    'CCBot',
+                    'anthropic-ai',
+                    'Claude-Web',
+                    'PerplexityBot',
+                    'cohere-ai',
+                    'Diffbot',
+                    'omgili',
+                    'facebookexternalhit',
+                ],
+                allow: ['/blog', '/blog/'],
+                disallow: ['/', '/works', '/about', '/india-ai', '/api/'],
+            },
+            // Everyone else
             {
                 userAgent: '*',
                 allow: '/',
-                disallow: ['/ssh/', '/verify/', '/api/', '/auth/'],
-            },
-            {
-                userAgent: 'Googlebot',
-                allow: '/',
-                disallow: ['/ssh/', '/verify/', '/api/', '/auth/'],
-            },
-            {
-                userAgent: 'Bingbot',
-                allow: '/',
-                disallow: ['/ssh/', '/verify/', '/api/', '/auth/'],
+                disallow: ['/api/', '/auth/', '/ssh/', '/verify/'],
             },
         ],
         sitemap: `${baseUrl}/sitemap.xml`,

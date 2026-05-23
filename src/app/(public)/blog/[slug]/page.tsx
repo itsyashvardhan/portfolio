@@ -27,6 +27,16 @@ export async function generateMetadata({
     return {
         title: article.seo_title || article.title,
         description: article.seo_description || article.excerpt,
+        robots: {
+            index: true,
+            follow: true,
+            googleBot: { index: true, follow: true },
+            // Allow AI crawlers to index metadata but not train on body content
+            nocache: false,
+        },
+        other: {
+            'ai-content-policy': 'metadata-only',
+        },
         openGraph: {
             title: article.title,
             description: article.excerpt,
