@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { eq } from 'drizzle-orm'
 import { getBlogBySlug } from '@/lib/data'
 import { fallbackBlogPosts } from '@/lib/fallback-content'
+import { db, schema } from '@/lib/db'
 
 function stripMarkdown(md: string): string {
     return md
@@ -17,10 +19,18 @@ function stripMarkdown(md: string): string {
         .trim()
 }
 
+function bufferResponse(buffer: ArrayBuffer) {
+    return new NextResponse(buffer, {
+        headers: {
+            'Content-Type': 'audio/mpeg',
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Content-Length': buffer.byteLength.toString(),
+        },
+    })
+}
+
 async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
-    // River — ElevenLabs' gender-neutral voice, warm and conversational.
-    // Paired with eleven_v3 (English) for natural rhythm and engagement.
-    const voiceId = 'SAz9YHcvj6GT2YYXdXww'
+    const voiceId = 'SAz9YHcvj6GT2YYXdXww' // River — gender-neutral, warm
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: {
@@ -32,11 +42,11 @@ async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer>
             text: text.slice(0, 5000),
             model_id: 'eleven_v3',
             voice_settings: {
-                stability: 0.38,        // some natural variation — avoids robotic flatness
-                similarity_boost: 0.78, // stays true to the voice character
-                style: 0.22,            // light expressiveness — draws the listener in
+                stability: 0.38,
+                similarity_boost: 0.78,
+                style: 0.22,
                 use_speaker_boost: true,
-                speed: 0.94,            // just slightly slower — easier to follow
+                speed: 0.94,
             },
         }),
     })
@@ -76,6 +86,22 @@ export async function GET(
         return NextResponse.json({ error: 'TTS not configured' }, { status: 503 })
     }
 
+    // Serve from cache if already generated
+    try {
+        const [cached] = await db
+            .select({ audio_b64: schema.podcastCache.audio_b64 })
+            .from(schema.podcastCache)
+            .where(eq(schema.podcastCache.slug, slug))
+            .limit(1)
+
+        if (cached) {
+            const buffer = Buffer.from(cached.audio_b64, 'base64')
+            return bufferResponse(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer)
+        }
+    } catch {
+        // cache table unavailable — fall through to generate
+    }
+
     const article = await getBlogBySlug(slug) ?? fallbackBlogPosts.find(p => p.slug === slug) ?? null
     if (!article) {
         return NextResponse.json({ error: 'Article not found' }, { status: 404 })
@@ -87,35 +113,33 @@ export async function GET(
         stripMarkdown(article.body || ''),
     ].filter(Boolean).join('\n\n')
 
+    let buffer: ArrayBuffer | null = null
+
     try {
-        const buffer = elevenKey
+        buffer = elevenKey
             ? await elevenLabsTTS(text, elevenKey)
             : await openAITTS(text, openAIKey!)
-
-        return new NextResponse(buffer, {
-            headers: {
-                'Content-Type': 'audio/mpeg',
-                'Cache-Control': 'public, max-age=86400',
-                'Content-Length': buffer.byteLength.toString(),
-            },
-        })
     } catch (err) {
         console.error('TTS error:', err)
-        // If ElevenLabs failed and we have OpenAI as fallback, try it
         if (elevenKey && openAIKey) {
             try {
-                const buffer = await openAITTS(text, openAIKey)
-                return new NextResponse(buffer, {
-                    headers: {
-                        'Content-Type': 'audio/mpeg',
-                        'Cache-Control': 'public, max-age=86400',
-                        'Content-Length': buffer.byteLength.toString(),
-                    },
-                })
+                buffer = await openAITTS(text, openAIKey)
             } catch (fallbackErr) {
                 console.error('OpenAI TTS fallback error:', fallbackErr)
             }
         }
+    }
+
+    if (!buffer) {
         return NextResponse.json({ error: 'TTS generation failed' }, { status: 502 })
     }
+
+    // Persist to cache (fire and forget)
+    const b64 = Buffer.from(buffer).toString('base64')
+    db.insert(schema.podcastCache)
+        .values({ slug, audio_b64: b64 })
+        .onConflictDoNothing()
+        .catch((e) => console.error('podcast cache write failed:', e))
+
+    return bufferResponse(buffer)
 }

@@ -138,6 +138,12 @@ export const adminUsers = pgTable('admin_users', {
     created_at: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow(),
 })
 
+export const podcastCache = pgTable('podcast_cache', {
+    slug: text('slug').primaryKey(),
+    audio_b64: text('audio_b64').notNull(),
+    created_at: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow(),
+})
+
 export const settings = pgTable('settings', {
     id: uuid('id').primaryKey().defaultRandom(),
     key: text('key').unique().notNull(),
