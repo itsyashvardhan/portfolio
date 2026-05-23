@@ -118,7 +118,7 @@ export default async function BlogDetailPage({
 
                 {/* Audio Version — only render if TTS is configured */}
                 {(process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.ELEVENLABS_API_KEY) && (
-                    <AudioPlayer slug={slug} />
+                    <AudioPlayer slug={slug} title={article.title} />
                 )}
 
                 {/* Markdown Body */}

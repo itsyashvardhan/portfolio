@@ -3,6 +3,8 @@ import { Inter, DotGothic16 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ConsoleMessage } from "./console-message";
 import { getStaticSiteConfig } from "@/lib/site-config";
+import { AudioProvider } from "@/context/audio-context";
+import { MiniPlayer } from "@/components/mini-player";
 import "./globals.css";
 
 const inter = Inter({
@@ -177,7 +179,10 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        {children}
+        <AudioProvider>
+          {children}
+          <MiniPlayer />
+        </AudioProvider>
         <ConsoleMessage
           ownerEmail={site.ownerEmail}
           ownerGithub={site.ownerGithub}
