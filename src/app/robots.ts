@@ -13,7 +13,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
                 allow: '/',
                 disallow: ['/api/', '/auth/', '/ssh/', '/verify/'],
             },
-            // AI training crawlers — blog metadata only
+            // AI crawlers — public content allowed, private routes blocked
             {
                 userAgent: [
                     'GPTBot',
@@ -27,8 +27,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
                     'omgili',
                     'facebookexternalhit',
                 ],
-                allow: ['/blog', '/blog/'],
-                disallow: ['/', '/works', '/about', '/india-ai', '/api/'],
+                allow: ['/', '/works', '/about', '/blog'],
+                disallow: ['/api/', '/auth/', '/ssh/', '/verify/'],
             },
             // Everyone else
             {
