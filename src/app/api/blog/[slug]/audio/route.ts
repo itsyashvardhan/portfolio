@@ -3,17 +3,61 @@ import { getBlogBySlug } from '@/lib/data'
 
 function stripMarkdown(md: string): string {
     return md
-        .replace(/!\[.*?\]\(.*?\)/g, '')         // remove images
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links -> text
-        .replace(/#{1,6}\s+/g, '')               // headings
-        .replace(/\*\*([^*]+)\*\*/g, '$1')       // bold
-        .replace(/\*([^*]+)\*/g, '$1')           // italic
-        .replace(/`{1,3}[^`]*`{1,3}/g, '')       // code
-        .replace(/^\|.*\|$/gm, '')               // tables
-        .replace(/^[-*+]\s+/gm, '')              // list bullets
-        .replace(/^>\s+/gm, '')                  // blockquotes
-        .replace(/\n{3,}/g, '\n\n')              // collapse blank lines
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/#{1,6}\s+/g, '')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/`{1,3}[^`]*`{1,3}/g, '')
+        .replace(/^\|.*\|$/gm, '')
+        .replace(/^[-*+]\s+/gm, '')
+        .replace(/^>\s+/gm, '')
+        .replace(/\n{3,}/g, '\n\n')
         .trim()
+}
+
+async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
+    // Adam voice — deep, natural, authoritative. Good for technical narration.
+    const voiceId = 'pNInz6obpgDQGcFmaJgB'
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+            'xi-api-key': apiKey,
+            'Content-Type': 'application/json',
+            'Accept': 'audio/mpeg',
+        },
+        body: JSON.stringify({
+            text: text.slice(0, 5000),
+            model_id: 'eleven_turbo_v2_5',
+            voice_settings: {
+                stability: 0.45,
+                similarity_boost: 0.82,
+                style: 0.1,
+                use_speaker_boost: true,
+            },
+        }),
+    })
+    if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`)
+    return res.arrayBuffer()
+}
+
+async function openAITTS(text: string, apiKey: string): Promise<ArrayBuffer> {
+    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            model: 'tts-1-hd',
+            input: text.slice(0, 4096),
+            voice: 'onyx',
+            response_format: 'mp3',
+            speed: 0.95,
+        }),
+    })
+    if (!res.ok) throw new Error(`OpenAI TTS ${res.status}: ${await res.text()}`)
+    return res.arrayBuffer()
 }
 
 export async function GET(
@@ -22,8 +66,10 @@ export async function GET(
 ) {
     const { slug } = await params
 
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
+    const elevenKey = process.env.ELEVENLABS_API_KEY
+    const openAIKey = process.env.OPENAI_API_KEY
+
+    if (!elevenKey && !openAIKey) {
         return NextResponse.json({ error: 'TTS not configured' }, { status: 503 })
     }
 
@@ -32,44 +78,41 @@ export async function GET(
         return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
-    // Build the narration text: title + excerpt + body
-    const narrationText = [
+    const text = [
         article.title + '.',
         article.excerpt ? article.excerpt + '.' : '',
         stripMarkdown(article.body || ''),
     ].filter(Boolean).join('\n\n')
 
-    // Truncate to OpenAI TTS limit (4096 chars)
-    const text = narrationText.slice(0, 4096)
+    try {
+        const buffer = elevenKey
+            ? await elevenLabsTTS(text, elevenKey)
+            : await openAITTS(text, openAIKey!)
 
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            model: 'tts-1-hd',
-            input: text,
-            voice: 'onyx',   // deep, authoritative voice — best for technical content
-            response_format: 'mp3',
-            speed: 0.95,
-        }),
-    })
-
-    if (!response.ok) {
-        const err = await response.text()
-        console.error('OpenAI TTS error:', err)
+        return new NextResponse(buffer, {
+            headers: {
+                'Content-Type': 'audio/mpeg',
+                'Cache-Control': 'public, max-age=86400',
+                'Content-Length': buffer.byteLength.toString(),
+            },
+        })
+    } catch (err) {
+        console.error('TTS error:', err)
+        // If ElevenLabs failed and we have OpenAI as fallback, try it
+        if (elevenKey && openAIKey) {
+            try {
+                const buffer = await openAITTS(text, openAIKey)
+                return new NextResponse(buffer, {
+                    headers: {
+                        'Content-Type': 'audio/mpeg',
+                        'Cache-Control': 'public, max-age=86400',
+                        'Content-Length': buffer.byteLength.toString(),
+                    },
+                })
+            } catch (fallbackErr) {
+                console.error('OpenAI TTS fallback error:', fallbackErr)
+            }
+        }
         return NextResponse.json({ error: 'TTS generation failed' }, { status: 502 })
     }
-
-    const audioBuffer = await response.arrayBuffer()
-
-    return new NextResponse(audioBuffer, {
-        headers: {
-            'Content-Type': 'audio/mpeg',
-            'Cache-Control': 'public, max-age=86400',
-            'Content-Length': audioBuffer.byteLength.toString(),
-        },
-    })
 }

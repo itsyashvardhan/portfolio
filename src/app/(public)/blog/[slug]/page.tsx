@@ -106,8 +106,10 @@ export default async function BlogDetailPage({
                     )}
                 </header>
 
-                {/* Audio Version */}
-                <AudioPlayer slug={slug} />
+                {/* Audio Version — only render if TTS is configured */}
+                {(process.env.OPENAI_API_KEY || process.env.ELEVENLABS_API_KEY) && (
+                    <AudioPlayer slug={slug} />
+                )}
 
                 {/* Markdown Body */}
                 <div className={styles.body}>
