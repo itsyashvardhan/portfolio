@@ -17,8 +17,9 @@ function stripMarkdown(md: string): string {
 }
 
 async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
-    // Adam voice — deep, natural, authoritative. Good for technical narration.
-    const voiceId = 'pNInz6obpgDQGcFmaJgB'
+    // River — ElevenLabs' gender-neutral voice, warm and conversational.
+    // Paired with eleven_v3 (English) for natural rhythm and engagement.
+    const voiceId = 'SAz9YHcvj6GT2YYXdXww'
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: {
@@ -28,12 +29,13 @@ async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer>
         },
         body: JSON.stringify({
             text: text.slice(0, 5000),
-            model_id: 'eleven_turbo_v2_5',
+            model_id: 'eleven_v3',
             voice_settings: {
-                stability: 0.45,
-                similarity_boost: 0.82,
-                style: 0.1,
+                stability: 0.38,        // some natural variation — avoids robotic flatness
+                similarity_boost: 0.78, // stays true to the voice character
+                style: 0.22,            // light expressiveness — draws the listener in
                 use_speaker_boost: true,
+                speed: 0.94,            // just slightly slower — easier to follow
             },
         }),
     })
