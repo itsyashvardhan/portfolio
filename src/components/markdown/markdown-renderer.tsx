@@ -10,6 +10,13 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import Image from 'next/image'
 import styles from './markdown.module.css'
+import { ParetoChart } from '@/components/blog/pareto-chart'
+import { VLLMPipeline } from '@/components/blog/vllm-pipeline'
+
+const COMPONENT_MAP: Record<string, React.ReactNode> = {
+    '/blog/pareto-chart.svg': <ParetoChart />,
+    '/blog/vllm-pipeline.svg': <VLLMPipeline />,
+}
 
 interface MarkdownRendererProps {
     content: string
@@ -44,12 +51,17 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                         </a>
                     ),
 
-                    // Images with Next.js Image optimization
+                    // Images — intercept known paths and render React components
                     img: ({ src, alt }) => {
                         if (!src) return null
 
                         const imgSrc = typeof src === 'string' ? src : ''
                         if (!imgSrc) return null
+
+                        // Render native React component instead of image file
+                        if (COMPONENT_MAP[imgSrc]) {
+                            return <>{COMPONENT_MAP[imgSrc]}</>
+                        }
 
                         // External images
                         if (imgSrc.startsWith('http')) {

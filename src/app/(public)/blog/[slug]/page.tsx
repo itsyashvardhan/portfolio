@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getBlogBySlug } from '@/lib/data'
 import { MarkdownRenderer } from '@/components/markdown'
+import { AudioPlayer } from '@/components/audio-player'
 import styles from '../page.module.css'
 import type { Metadata } from 'next'
 
@@ -57,7 +58,6 @@ export default async function BlogDetailPage({
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('en-US', {
             month: 'long',
-            day: 'numeric',
             year: 'numeric'
         })
     }
@@ -105,6 +105,9 @@ export default async function BlogDetailPage({
                         </div>
                     )}
                 </header>
+
+                {/* Audio Version */}
+                <AudioPlayer slug={slug} />
 
                 {/* Markdown Body */}
                 <div className={styles.body}>

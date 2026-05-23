@@ -5,9 +5,11 @@ const now = new Date().toISOString()
 export const fallbackBlogPosts: Blog[] = [
     {
         id: 'fallback-blog-1',
-        slug: 'vision-encoder-optimization-edge-vllm',
-        title: 'Vision Encoder Optimization for Edge Visual LLMs',
-        body: `This is the research I published at ICCCN 2026 in Manchester. The core question I was investigating: when you deploy a visual LLM on edge hardware, where does the latency actually come from? The answer surprised me, and it changes how you should think about model selection entirely.
+        slug: 'cache-cliff-edge-ai-latency',
+        title: 'The Cache Cliff: Why Edge AI Latency Isn\'t Linear',
+        body: `Everyone benchmarks edge AI models by accuracy. Almost nobody benchmarks where the latency actually comes from. That gap is why most encoder selection decisions are wrong before the hardware even boots.
+
+This is the research I published at ICCCN 2026 in Manchester. The finding changed how I think about model selection entirely.
 
 ## The Sensory Bottleneck
 
@@ -83,14 +85,14 @@ The "best" encoder is always relative to your cache topology, your resolution re
 ## What's Next
 
 The paper is accepted at ICCCN 2026 in Manchester. The project site has the interactive encoder selector, full benchmark tables, and the architecture taxonomy. If you're building anything that involves vision on constrained hardware, I think the cache cliff framing is worth understanding before you commit to an architecture.`,
-        excerpt: 'I benchmarked 8 vision encoder architectures across 4 edge platforms for my ICCCN 2026 paper. The finding: the encoder, not the LLM decoder, is the bottleneck. And latency does not scale linearly with model size.',
-        banner_image: '/blog/vllm-hero.png',
+        excerpt: 'At a certain model size, edge AI latency stops scaling linearly and falls off a cliff. I found it, named it, and built a selection matrix around it. Here is what the data showed.',
+        banner_image: null,
         tags: ['research', 'edge-ai', 'ml-systems', 'icccn-2026'],
         read_time: 8,
         status: 'published',
         seo_title: 'Vision Encoder Optimization for Edge Visual LLMs | ICCCN 2026',
         seo_description: 'I benchmarked 8 vision encoder architectures across 4 edge platforms. The encoder accounts for 70-85% of TTFT. This is the Cache Cliff phenomenon and why latency is not linear.',
-        published_at: '2026-03-15T00:00:00.000Z',
+        published_at: '2026-05-01T00:00:00.000Z',
         created_at: now,
         updated_at: now,
     },

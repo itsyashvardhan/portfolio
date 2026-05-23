@@ -25,8 +25,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
+            month: 'long',
             year: 'numeric'
         })
     }
@@ -68,9 +67,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                     href={`/blog/${article.slug}`}
                                     className={styles.card}
                                 >
-                                    {/* Banner Image */}
-                                    {article.banner_image && (
-                                        <div className={styles.cardImage}>
+                                    {/* Abstract Art */}
+                                    <div className={styles.cardImage}>
+                                        {article.banner_image ? (
                                             <Image
                                                 src={article.banner_image}
                                                 alt={article.title}
@@ -78,8 +77,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                                 sizes="(max-width: 768px) 100vw, 50vw"
                                                 style={{ objectFit: 'cover' }}
                                             />
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <img
+                                                src="/blog/abstract-art.svg"
+                                                alt=""
+                                                aria-hidden="true"
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                        )}
+                                    </div>
 
                                     <div className={styles.cardContent}>
                                         {/* Meta */}

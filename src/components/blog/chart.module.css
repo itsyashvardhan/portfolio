@@ -1,0 +1,305 @@
+/* Shared styles for blog chart components */
+/* All colors use design system CSS variables — adapts to light/dark mode */
+
+/* Regime zone colors — intentionally subtle, both modes */
+:root {
+    --regime-rt:  color-mix(in srgb, #10b981, transparent 92%);
+    --regime-int: color-mix(in srgb, #06b6d4, transparent 92%);
+}
+
+.figure {
+    margin: var(--space-8) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-surface);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.label {
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+/* ---- Pareto Chart SVG ---- */
+.svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: var(--space-3) var(--space-2);
+}
+
+.grid {
+    stroke: var(--color-border);
+    stroke-width: 1;
+}
+
+.axis {
+    stroke: var(--color-border);
+    stroke-width: 1.5;
+}
+
+.tick {
+    font-size: 10px;
+    fill: var(--color-text-tertiary);
+    font-family: var(--font-inter, 'Inter', monospace);
+}
+
+.axisLabel {
+    font-size: 10px;
+    fill: var(--color-text-tertiary);
+    font-family: var(--font-inter, 'Inter', monospace);
+    letter-spacing: 0.02em;
+}
+
+.regimeLabel {
+    font-size: 9px;
+    fill: var(--color-text-tertiary);
+    font-family: var(--font-inter, 'Inter', monospace);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.regimeLabel[data-regime="rt"]  { fill: #10b981; opacity: 0.7; }
+.regimeLabel[data-regime="int"] { fill: #06b6d4; opacity: 0.7; }
+
+/* Points */
+.pointHybrid     { fill: #10b981; }
+.pointCnn        { fill: var(--color-text-tertiary); }
+.pointCnnPareto  { fill: var(--color-text-secondary); }
+.pointVit        { fill: #f59e0b; }
+.pointCliff      { fill: #ef4444; opacity: 0.85; }
+.pointCliffRing  { stroke: #ef4444; stroke-width: 1; opacity: 0.3; }
+
+/* Labels */
+.labelBold {
+    font-size: 9.5px;
+    font-weight: 600;
+    fill: var(--color-text-secondary);
+    font-family: var(--font-inter, 'Inter', sans-serif);
+}
+
+.labelMuted {
+    font-size: 9px;
+    fill: var(--color-text-tertiary);
+    font-family: var(--font-inter, 'Inter', sans-serif);
+}
+
+/* Cache Cliff annotation */
+.cliffArrow {
+    stroke: #ef4444;
+    stroke-width: 1;
+    stroke-dasharray: 3 2;
+    opacity: 0.7;
+}
+
+.cliffLabel {
+    font-size: 9px;
+    fill: #ef4444;
+    font-family: var(--font-inter, 'Inter', monospace);
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+/* ---- Legend ---- */
+.legend {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+}
+
+.legendItem[data-type="hybrid"] { color: #10b981; }
+.legendItem[data-type="vit"]    { color: #f59e0b; }
+.legendItem[data-type="cliff"]  { color: #ef4444; }
+
+/* ---- Pipeline ---- */
+.pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--space-6) var(--space-5);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pipelineRow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.stage {
+    flex: 1;
+    min-width: 120px;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.stageBottleneck {
+    border-color: #10b981;
+    background: color-mix(in srgb, #10b981, var(--color-bg) 96%);
+}
+
+.bottleneckBadge {
+    font-size: 8px;
+    font-weight: var(--font-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #10b981;
+    background: color-mix(in srgb, #10b981, transparent 85%);
+    border-radius: var(--radius-sm);
+    padding: 2px 6px;
+    width: fit-content;
+}
+
+.stageName {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text);
+    line-height: 1.3;
+}
+
+.stageBottleneck .stageName {
+    color: #10b981;
+}
+
+.stageSub {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-medium);
+}
+
+.stageDivider {
+    width: 100%;
+    height: 1px;
+    background: var(--color-border);
+    margin: var(--space-1) 0;
+}
+
+.stageDetail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+}
+
+.stageLatency {
+    font-size: 10px;
+    font-weight: var(--font-medium);
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    margin-top: auto;
+    padding-top: var(--space-2);
+}
+
+.stageBottleneck .stageLatency {
+    color: #10b981;
+}
+
+.arrow {
+    color: var(--color-text-tertiary);
+    padding: 0 var(--space-2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* ---- Formula ---- */
+.formula {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+}
+
+.formulaLabel {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
+}
+
+.formulaTerm {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.formulaOp {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+}
+
+.formulaNote {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    margin-left: var(--space-3);
+    font-style: italic;
+}
+
+/* ---- Caption ---- */
+.caption {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    border-top: 1px solid var(--color-border);
+    line-height: 1.6;
+    max-width: none;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .pipeline {
+        flex-direction: column;
+        padding: var(--space-4);
+    }
+
+    .pipelineRow {
+        flex-direction: column;
+    }
+
+    .arrow {
+        transform: rotate(90deg);
+        padding: var(--space-1) 0;
+    }
+
+    .legend {
+        gap: var(--space-3);
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
