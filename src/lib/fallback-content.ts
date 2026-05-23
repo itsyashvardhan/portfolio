@@ -5,44 +5,94 @@ const now = new Date().toISOString()
 export const fallbackBlogPosts: Blog[] = [
     {
         id: 'fallback-blog-1',
-        slug: 'cache-cliff-edge-ai-latency',
-        title: 'The Cache Cliff: Why Edge AI Latency Isn\'t Linear',
-        body: `When benchmarking vision encoders for edge VLLM deployments, a pattern emerged that isn't discussed enough: latency doesn't scale linearly with model size.
+        slug: 'vision-encoder-optimization-edge-vllm',
+        title: 'Vision Encoder Optimization for Edge Visual LLMs',
+        body: `![VLLMArchitect research dashboard showing the vision encoder optimization framework accepted at ICCCN 2026](/blog/vllm-hero.png)
 
-At a certain threshold — when the model's working set exceeds the NPU's L2/L3 cache — you hit what I'm calling the **Cache Cliff**. Latency jumps non-linearly, sometimes 3–5×, with only a modest increase in parameter count.
+This is the research I published at ICCCN 2026 in Manchester. The core question I was investigating: when you deploy a visual LLM on edge hardware, where does the latency actually come from? The answer surprised me, and it changes how you should think about model selection entirely.
 
-## What this means in practice
+## The Sensory Bottleneck
 
-Across 8 architectures and 4 hardware platforms (Raspberry Pi 5, Google Coral TPU, NVIDIA Jetson Orin Nano, and one mobile SoC), the pattern held consistently:
+The common assumption is that the language model decoder is the expensive part of a VLLM. It's not. The vision encoder is.
 
-- EfficientFormer-L1: **1.6 ms** TTFT
-- ViT-Base: **98.0 ms** TTFT
+Across my benchmarks, the encoder accounted for 70 to 85 percent of Time-to-First-Token (TTFT). The LLM portion, which everyone obsesses over, was secondary. I'm calling this the **Sensory Bottleneck Hypothesis**: the image tokenisation stage, not the autoregressive decoder, determines the real-time viability of edge VLLM deployments.
 
-The jump isn't linear between them. There are cliff points where adding parameters produces outsized latency penalties.
+The full pipeline looks like this:
 
-## The Sensory Bottleneck Hypothesis
+**TTFT = L_enc + L_proj + L_prefill(T)**
 
-Vision encoders represent 70–85% of TTFT in edge VLLM deployments. The language model — often assumed to be the bottleneck — is not the constraint. The image tokenisation stage is.
+Where L_enc is encoder latency (the bottleneck), L_proj is the projector that aligns encoder embeddings with LLM space, and T is the visual token count passed to the prefill stage.
 
-This reframes encoder selection entirely. You're not choosing between accuracy tiers; you're choosing between latency regimes:
+![The edge VLLM inference pipeline showing input processing, vision encoder, projector, and LLM decoder stages](/blog/vllm-pipeline.png)
 
-- **Real-time**: < 15 ms — EfficientFormer-L1 class
-- **Interactive**: < 100 ms — MobileViT class
-- **Batch**: < 500 ms — ViT-Base class
+## What I Benchmarked
 
-## Implication for hardware-aware design
+I ran 8 vision encoder architectures across 4 hardware platforms: Raspberry Pi 5, Raspberry Pi 5 with Google Coral TPU, NVIDIA Jetson Orin Nano, and iPhone 15 Pro. Every number below is averaged over 100 inference passes with a 10-pass warm-up, with variance under 8%.
 
-Don't interpolate between benchmarks on different hardware. Measure cache behaviour directly. A model that sits comfortably in L2 on a Jetson may spill to DRAM on a Coral TPU, changing its latency profile entirely.
+| Backbone | Platform | Precision | Latency (ms) | Accuracy |
+|---|---|---|---|---|
+| EfficientNet-B0 | Raspberry Pi 5 | TFLite INT8 | 28-32 | 77.1% |
+| EfficientNet-B3 | Jetson Orin Nano | TensorRT FP16 | 14.2 | 81.6% |
+| EfficientNet-B4 | Jetson Orin Nano | TensorRT FP16 | 48.5 | 82.9% |
+| MobileNetV3 | Legacy Pi 4 | TFLite INT8 | 42-56 | 75.2% |
+| MobileViT-XS | iPhone 15 Pro | CoreML NPU | 7.2 | 78.9% |
+| ViT-Base/16 | Jetson Orin Nano | TensorRT FP16 | 98.0 | 81.0% |
+| FastViT-HD | Jetson Orin Nano | TensorRT FP16 | 18.5 | 82.2% |
+| EfficientFormer-L1 | RPi 5 + Coral TPU | TFLite + NNAPI | 1.6 | 79.2% |
 
-The hardware-aware encoder selection matrix from this research maps architectures to regimes per platform — because the "best" encoder is always relative to your cache topology.`,
-        excerpt: 'A non-linear latency jump occurs when model size exceeds L2/L3 NPU cache — and it changes how you should select encoders for edge deployment.',
-        banner_image: '/blog/hero-devanagari.png',
-        tags: ['research', 'edge-ai', 'ml-systems'],
-        read_time: 5,
+That EfficientFormer-L1 number is the one that stuck with me: **1.6 ms** on a Coral TPU, 79.2% accuracy. ViT-Base gets 81.0% accuracy on a Jetson at **98 ms**. You're trading 60x latency for 1.8 percentage points.
+
+![Full benchmark results table across 8 architectures and 4 edge hardware platforms](/blog/vllm-benchmarks.png)
+
+## The Cache Cliff
+
+The most important finding is what happens between EfficientNet-B3 and EfficientNet-B4 on the Jetson Orin Nano.
+
+B3 runs at 14.2 ms. B4 runs at 48.5 ms. That's a 3.4x jump in latency for 1.3 percentage points of accuracy gain (81.6% to 82.9%).
+
+This is not a linear scaling penalty. It's a cliff. When the model's working set exceeds the L2/L3 cache on the NPU, you get a non-linear jump as the system spills to DRAM. I'm calling this the **Cache Cliff phenomenon**: the point where model size crosses the 2-8 MB L2/L3 cache constraint and latency jumps discontinuously.
+
+The practical consequence is that you can't interpolate between benchmarks. You need to know where the cliff is for each specific hardware platform you're targeting.
+
+## Three Governing Design Principles
+
+From the formal complexity analysis and Roofline modeling, I derived three principles that hold across all four platforms.
+
+**The Law of Resolution:** Encoder latency scales quadratically with input resolution for CNNs and quartically for ViTs. Doubling resolution increases CNN latency by roughly 4x and ViT latency by roughly 16x. For OCR tasks, EfficientNet-B0 at 384px consistently outperforms EfficientNet-B4 at 224px because higher resolution preserves the spatial detail that downsampling destroys.
+
+**The Law of Depth vs Width:** On edge NPUs, inference latency is dominated by sequential memory access overhead, not arithmetic computation. Deep networks create compute unit starvation. ResNet-101 leaves processing units idle waiting for weight transfers from off-chip DRAM. Wide, shallow networks like MobileNetV3 and EfficientFormer maximise SIMD utilisation instead.
+
+**The Hybridization Principle:** Pure ViTs have disproportionate latency on edge accelerators because of quadratic attention complexity and suboptimal operator support. The Coral TPU has to offload ViT-specific ops like Softmax and reshape to the CPU. Hybrid CNN-Transformer architectures use a convolutional stem for spatial reduction before any attention blocks, getting most of the accuracy with far better hardware utilisation. EfficientFormer-L1 achieves 79.2% at 1.6 ms versus ViT-Base at 81.0% at 98 ms.
+
+## The Encoder Selection Matrix
+
+Based on everything above, I built a hardware-aware selection matrix across three latency regimes:
+
+| Regime | Target Platform | Recommended Encoder | Accuracy | Notes |
+|---|---|---|---|---|
+| Real-Time < 15ms | IoT / Raspberry Pi | MobileViT-XS, EfficientFormer-L1 | 78-79% | Only hybrid models are feasible here |
+| Interactive < 50ms | Coral TPU, Jetson Nano | EfficientNet-B0 to B3, FastViT | 79-82% | Sweet spot for balanced performance |
+| Batch < 200ms | Jetson Orin, Edge GPU | EfficientNet-B4+ | 82-83% | Watch the cache cliff beyond B3 |
+
+The interactive tool I built to navigate this interactively is live at [vllmarchitect.yashvardhan.dev](https://vllmarchitect.yashvardhan.dev). It lets you select your hardware platform and latency budget and get a specific encoder recommendation with estimated latency.
+
+## What I Got Wrong Initially
+
+My first instinct was to rank encoders by accuracy and work backwards from there. That's the wrong frame. On edge hardware, you're not picking the most accurate model that fits your latency budget. You're picking the model that sits below the cache cliff on your specific hardware, and then checking whether its accuracy is sufficient.
+
+The "best" encoder is always relative to your cache topology, your resolution requirements, and whether you need real-time or batch throughput. ViT-Base is genuinely great on a server. On a Jetson Orin with a 15ms budget, it's unusable.
+
+## What's Next
+
+The paper is accepted at ICCCN 2026 in Manchester. The project site has the interactive encoder selector, full benchmark tables, and the architecture taxonomy. If you're building anything that involves vision on constrained hardware, I think the cache cliff framing is worth understanding before you commit to an architecture.`,
+        excerpt: 'I benchmarked 8 vision encoder architectures across 4 edge platforms for my ICCCN 2026 paper. The finding: the encoder, not the LLM decoder, is the bottleneck. And latency does not scale linearly with model size.',
+        banner_image: '/blog/vllm-hero.png',
+        tags: ['research', 'edge-ai', 'ml-systems', 'icccn-2026'],
+        read_time: 8,
         status: 'published',
-        seo_title: null,
-        seo_description: null,
-        published_at: '2026-01-10T00:00:00.000Z',
+        seo_title: 'Vision Encoder Optimization for Edge Visual LLMs | ICCCN 2026',
+        seo_description: 'I benchmarked 8 vision encoder architectures across 4 edge platforms. The encoder accounts for 70-85% of TTFT. This is the Cache Cliff phenomenon and why latency is not linear.',
+        published_at: '2026-03-15T00:00:00.000Z',
         created_at: now,
         updated_at: now,
     },
