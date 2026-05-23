@@ -19,10 +19,29 @@ function stripMarkdown(md: string): string {
         .trim()
 }
 
-function bufferResponse(buffer: ArrayBuffer) {
+function pcmToWav(pcm: Buffer, sampleRate = 24000, channels = 1, bitsPerSample = 16): Buffer {
+    const dataLen = pcm.byteLength
+    const header = Buffer.alloc(44)
+    header.write('RIFF', 0)
+    header.writeUInt32LE(36 + dataLen, 4)
+    header.write('WAVE', 8)
+    header.write('fmt ', 12)
+    header.writeUInt32LE(16, 16)             // PCM chunk size
+    header.writeUInt16LE(1, 20)              // PCM format
+    header.writeUInt16LE(channels, 22)
+    header.writeUInt32LE(sampleRate, 24)
+    header.writeUInt32LE(sampleRate * channels * bitsPerSample / 8, 28) // byte rate
+    header.writeUInt16LE(channels * bitsPerSample / 8, 32)              // block align
+    header.writeUInt16LE(bitsPerSample, 34)
+    header.write('data', 36)
+    header.writeUInt32LE(dataLen, 40)
+    return Buffer.concat([header, pcm])
+}
+
+function bufferResponse(buffer: ArrayBuffer, contentType = 'audio/mpeg') {
     return new NextResponse(buffer, {
         headers: {
-            'Content-Type': 'audio/mpeg',
+            'Content-Type': contentType,
             'Cache-Control': 'public, max-age=31536000, immutable',
             'Content-Length': buffer.byteLength.toString(),
         },
@@ -78,8 +97,9 @@ async function geminiTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
     const json = await res.json()
     const b64 = json.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
     if (!b64) throw new Error('Gemini TTS: no audio data in response')
-    const raw = Buffer.from(b64, 'base64')
-    return raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer
+    const pcm = Buffer.from(b64, 'base64')
+    const wav = pcmToWav(pcm)
+    return wav.buffer.slice(wav.byteOffset, wav.byteOffset + wav.byteLength) as ArrayBuffer
 }
 
 async function openAITTS(text: string, apiKey: string): Promise<ArrayBuffer> {
@@ -170,5 +190,6 @@ export async function GET(
         .onConflictDoNothing()
         .catch((e) => console.error('podcast cache write failed:', e))
 
-    return bufferResponse(buffer)
+    const isWav = geminiKey && buffer
+    return bufferResponse(buffer, isWav ? 'audio/wav' : 'audio/mpeg')
 }
