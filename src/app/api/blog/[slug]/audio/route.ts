@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const maxDuration = 300 // 5 min — only runs once per post, then cached
 import { eq } from 'drizzle-orm'
+import { createHash } from 'crypto'
 import { getBlogBySlug } from '@/lib/data'
 import { fallbackBlogPosts } from '@/lib/fallback-content'
 import { db, schema } from '@/lib/db'
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function stripMarkdown(md: string): string {
     return md
@@ -19,136 +26,185 @@ function stripMarkdown(md: string): string {
         .trim()
 }
 
-function pcmToWav(pcm: Buffer, sampleRate = 24000, channels = 1, bitsPerSample = 16): Buffer {
+function contentHash(text: string): string {
+    return createHash('sha256').update(text).digest('hex').slice(0, 16)
+}
+
+function pcmToWav(pcm: Buffer, sampleRate = 48000, channels = 1, bitsPerSample = 16): Buffer {
     const dataLen = pcm.byteLength
     const header = Buffer.alloc(44)
     header.write('RIFF', 0)
     header.writeUInt32LE(36 + dataLen, 4)
     header.write('WAVE', 8)
     header.write('fmt ', 12)
-    header.writeUInt32LE(16, 16)             // PCM chunk size
-    header.writeUInt16LE(1, 20)              // PCM format
+    header.writeUInt32LE(16, 16)
+    header.writeUInt16LE(1, 20)
     header.writeUInt16LE(channels, 22)
     header.writeUInt32LE(sampleRate, 24)
-    header.writeUInt32LE(sampleRate * channels * bitsPerSample / 8, 28) // byte rate
-    header.writeUInt16LE(channels * bitsPerSample / 8, 32)              // block align
+    header.writeUInt32LE(sampleRate * channels * bitsPerSample / 8, 28)
+    header.writeUInt16LE(channels * bitsPerSample / 8, 32)
     header.writeUInt16LE(bitsPerSample, 34)
     header.write('data', 36)
     header.writeUInt32LE(dataLen, 40)
     return Buffer.concat([header, pcm])
 }
 
-function bufferResponse(buffer: ArrayBuffer, contentType = 'audio/mpeg') {
-    return new NextResponse(buffer, {
+function toArrayBuffer(buf: Buffer): ArrayBuffer {
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer
+}
+
+function wavResponse(wav: Buffer) {
+    return new NextResponse(toArrayBuffer(wav), {
         headers: {
-            'Content-Type': contentType,
+            'Content-Type': 'audio/wav',
             'Cache-Control': 'public, max-age=31536000, immutable',
-            'Content-Length': buffer.byteLength.toString(),
+            'Content-Length': wav.byteLength.toString(),
         },
     })
 }
 
-async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
-    const voiceId = 'SAz9YHcvj6GT2YYXdXww' // River — gender-neutral, warm
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-        method: 'POST',
-        headers: {
-            'xi-api-key': apiKey,
-            'Content-Type': 'application/json',
-            'Accept': 'audio/mpeg',
-        },
-        body: JSON.stringify({
-            text: text.slice(0, 5000),
-            model_id: 'eleven_v3',
-            voice_settings: {
-                stability: 0.38,
-                similarity_boost: 0.78,
-                style: 0.22,
-                use_speaker_boost: true,
-                speed: 0.94,
-            },
-        }),
-    })
-    if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`)
-    return res.arrayBuffer()
-}
+// ---------------------------------------------------------------------------
+// Step 1: Generate podcast script via Gemini text model
+// ---------------------------------------------------------------------------
 
-async function geminiTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
-    // Kore — calm, clear, neutral voice. Good for technical content.
+const SCRIPT_PROMPT = `You are converting a technical blog post into a two-person podcast dialogue.
+
+Speakers:
+- Charon: analytical critic. Asks probing questions, challenges assumptions, wants to know why things matter. Delivers with skepticism but genuine curiosity.
+- Aoede: engaging host. Reframes Charon's challenges accessibly, keeps the energy up, draws out the insight.
+
+Rules:
+- Use ONLY information from the blog post — no invented facts, no padding
+- Every line must start with exactly "Charon: " or "Aoede: "
+- Use inline delivery cues in square brackets (e.g. [skeptical], [curious], [excited], [thoughtful]) — 2–4 per speaker total, only where they add meaning
+- Aim for 10–16 exchanges (Charon/Aoede turns), roughly 500–800 words total
+- Start with Aoede setting the scene, end with a clear takeaway
+
+Blog post:
+`
+
+async function generateScript(articleText: string, apiKey: string): Promise<string> {
     const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: text.slice(0, 5000) }] }],
-                generationConfig: {
-                    response_modalities: ['AUDIO'],
-                    speech_config: {
-                        voice_config: {
-                            prebuilt_voice_config: { voice_name: 'Zephyr' },
-                        },
-                    },
-                },
+                contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText.slice(0, 12000) }] }],
+                generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
             }),
         }
     )
-    if (!res.ok) throw new Error(`Gemini TTS ${res.status}: ${await res.text()}`)
+    if (!res.ok) throw new Error(`Script generation failed: ${res.status} ${await res.text()}`)
     const json = await res.json()
-    const b64 = json.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
-    if (!b64) throw new Error('Gemini TTS: no audio data in response')
-    const pcm = Buffer.from(b64, 'base64')
-    const wav = pcmToWav(pcm)
-    return wav.buffer.slice(wav.byteOffset, wav.byteOffset + wav.byteLength) as ArrayBuffer
+    const script = json.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined
+    if (!script) throw new Error('Script generation: empty response')
+    return script.trim()
 }
 
-async function openAITTS(text: string, apiKey: string): Promise<ArrayBuffer> {
-    const res = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            model: 'tts-1-hd',
-            input: text.slice(0, 4096),
-            voice: 'onyx',
-            response_format: 'mp3',
-            speed: 0.95,
-        }),
-    })
-    if (!res.ok) throw new Error(`OpenAI TTS ${res.status}: ${await res.text()}`)
-    return res.arrayBuffer()
+// ---------------------------------------------------------------------------
+// Step 2: Multi-speaker TTS — 3.1 first, fallback to 2.5
+// ---------------------------------------------------------------------------
+
+// Chunk script into segments ≤ ~12K chars to stay under 16K token limit
+function chunkScript(script: string, maxChars = 12000): string[] {
+    if (script.length <= maxChars) return [script]
+    const lines = script.split('\n')
+    const chunks: string[] = []
+    let current = ''
+    for (const line of lines) {
+        if (current.length + line.length + 1 > maxChars) {
+            if (current) chunks.push(current.trim())
+            current = line
+        } else {
+            current += (current ? '\n' : '') + line
+        }
+    }
+    if (current) chunks.push(current.trim())
+    return chunks
 }
+
+const TTS_MODELS = [
+    { id: 'gemini-3.1-flash-tts-preview', sampleRate: 24000 },
+    { id: 'gemini-2.5-flash-preview-tts', sampleRate: 24000 },
+]
+
+async function multiSpeakerTTS(script: string, apiKey: string): Promise<{ pcm: Buffer; sampleRate: number }> {
+    const chunks = chunkScript(script)
+    let activeSampleRate = 48000
+    const pcmParts: Buffer[] = []
+
+    for (const chunk of chunks) {
+        let chunkPcm: Buffer | null = null
+
+        for (const model of TTS_MODELS) {
+            try {
+                const res = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: chunk }] }],
+                            generationConfig: {
+                                response_modalities: ['AUDIO'],
+                                speech_config: {
+                                    multi_speaker_voice_config: {
+                                        speaker_voice_configs: [
+                                            {
+                                                speaker: 'Charon',
+                                                voice_config: { prebuilt_voice_config: { voice_name: 'Charon' } },
+                                            },
+                                            {
+                                                speaker: 'Aoede',
+                                                voice_config: { prebuilt_voice_config: { voice_name: 'Aoede' } },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                        }),
+                    }
+                )
+
+                if (res.status === 503 || res.status === 404) {
+                    console.warn(`${model.id} unavailable, trying fallback`)
+                    continue
+                }
+                if (!res.ok) throw new Error(`TTS ${model.id}: ${res.status} ${await res.text()}`)
+
+                const json = await res.json()
+                const b64 = json.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data as string | undefined
+                if (!b64) throw new Error(`${model.id}: no audio data in response`)
+
+                chunkPcm = Buffer.from(b64, 'base64')
+                activeSampleRate = model.sampleRate
+                break
+            } catch (err) {
+                console.error(`TTS model ${model.id} failed:`, err)
+            }
+        }
+
+        if (!chunkPcm) throw new Error('All TTS models failed for chunk')
+        pcmParts.push(chunkPcm)
+    }
+
+    return { pcm: Buffer.concat(pcmParts), sampleRate: activeSampleRate }
+}
+
+// ---------------------------------------------------------------------------
+// GET handler
+// ---------------------------------------------------------------------------
 
 export async function GET(
     _req: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params
-
     const geminiKey = process.env.GEMINI_API_KEY
-    const elevenKey = process.env.ELEVENLABS_API_KEY
-    const openAIKey = process.env.OPENAI_API_KEY
 
-    if (!geminiKey && !elevenKey && !openAIKey) {
+    if (!geminiKey) {
         return NextResponse.json({ error: 'TTS not configured' }, { status: 503 })
-    }
-
-    // Serve from cache if already generated
-    try {
-        const [cached] = await db
-            .select({ audio_b64: schema.podcastCache.audio_b64 })
-            .from(schema.podcastCache)
-            .where(eq(schema.podcastCache.slug, slug))
-            .limit(1)
-
-        if (cached) {
-            const buffer = Buffer.from(cached.audio_b64, 'base64')
-            return bufferResponse(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer)
-        }
-    } catch {
-        // cache table unavailable — fall through to generate
     }
 
     const article = await getBlogBySlug(slug) ?? fallbackBlogPosts.find(p => p.slug === slug) ?? null
@@ -156,40 +212,51 @@ export async function GET(
         return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
-    const text = [
+    const articleText = [
         article.title + '.',
         article.excerpt ? article.excerpt + '.' : '',
         stripMarkdown(article.body || ''),
     ].filter(Boolean).join('\n\n')
 
-    let buffer: ArrayBuffer | null = null
+    const hash = contentHash(articleText)
 
-    const providers: Array<() => Promise<ArrayBuffer>> = [
-        ...(geminiKey ? [() => geminiTTS(text, geminiKey)] : []),
-        ...(elevenKey ? [() => elevenLabsTTS(text, elevenKey)] : []),
-        ...(openAIKey ? [() => openAITTS(text, openAIKey)] : []),
-    ]
+    // Serve from cache if content hasn't changed
+    try {
+        const [cached] = await db
+            .select({ audio_b64: schema.podcastCache.audio_b64, content_hash: schema.podcastCache.content_hash })
+            .from(schema.podcastCache)
+            .where(eq(schema.podcastCache.slug, slug))
+            .limit(1)
 
-    for (const provider of providers) {
-        try {
-            buffer = await provider()
-            break
-        } catch (err) {
-            console.error('TTS provider failed, trying next:', err)
+        if (cached && cached.content_hash === hash) {
+            const wav = Buffer.from(cached.audio_b64, 'base64')
+            return wavResponse(wav)
         }
+    } catch {
+        // cache unavailable — generate fresh
     }
 
-    if (!buffer) {
-        return NextResponse.json({ error: 'TTS generation failed' }, { status: 502 })
+    try {
+        // Step 1: Convert blog post to podcast script
+        const script = await generateScript(articleText, geminiKey)
+
+        // Step 2: Synthesise dual-voice audio
+        const { pcm, sampleRate } = await multiSpeakerTTS(script, geminiKey)
+        const wav = pcmToWav(pcm, sampleRate)
+
+        // Persist — upsert so stale entries are replaced on content change
+        const b64 = wav.toString('base64')
+        db.insert(schema.podcastCache)
+            .values({ slug, audio_b64: b64, content_hash: hash })
+            .onConflictDoUpdate({
+                target: schema.podcastCache.slug,
+                set: { audio_b64: b64, content_hash: hash },
+            })
+            .catch((e) => console.error('podcast cache write failed:', e))
+
+        return wavResponse(wav)
+    } catch (err) {
+        console.error('Podcast generation failed:', err)
+        return NextResponse.json({ error: 'Podcast generation failed' }, { status: 502 })
     }
-
-    // Persist to cache (fire and forget)
-    const b64 = Buffer.from(buffer).toString('base64')
-    db.insert(schema.podcastCache)
-        .values({ slug, audio_b64: b64 })
-        .onConflictDoNothing()
-        .catch((e) => console.error('podcast cache write failed:', e))
-
-    const isWav = geminiKey && buffer
-    return bufferResponse(buffer, isWav ? 'audio/wav' : 'audio/mpeg')
 }

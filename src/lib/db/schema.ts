@@ -141,6 +141,7 @@ export const adminUsers = pgTable('admin_users', {
 export const podcastCache = pgTable('podcast_cache', {
     slug: text('slug').primaryKey(),
     audio_b64: text('audio_b64').notNull(),
+    content_hash: text('content_hash'),
     created_at: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow(),
 })
 
