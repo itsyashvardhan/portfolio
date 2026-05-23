@@ -107,7 +107,7 @@ export default async function BlogDetailPage({
                 </header>
 
                 {/* Audio Version — only render if TTS is configured */}
-                {(process.env.OPENAI_API_KEY || process.env.ELEVENLABS_API_KEY) && (
+                {(process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.ELEVENLABS_API_KEY) && (
                     <AudioPlayer slug={slug} />
                 )}
 

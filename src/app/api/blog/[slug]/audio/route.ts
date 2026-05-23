@@ -54,6 +54,34 @@ async function elevenLabsTTS(text: string, apiKey: string): Promise<ArrayBuffer>
     return res.arrayBuffer()
 }
 
+async function geminiTTS(text: string, apiKey: string): Promise<ArrayBuffer> {
+    // Kore — calm, clear, neutral voice. Good for technical content.
+    const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: text.slice(0, 5000) }] }],
+                generationConfig: {
+                    response_modalities: ['AUDIO'],
+                    speech_config: {
+                        voice_config: {
+                            prebuilt_voice_config: { voice_name: 'Kore' },
+                        },
+                    },
+                },
+            }),
+        }
+    )
+    if (!res.ok) throw new Error(`Gemini TTS ${res.status}: ${await res.text()}`)
+    const json = await res.json()
+    const b64 = json.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+    if (!b64) throw new Error('Gemini TTS: no audio data in response')
+    const raw = Buffer.from(b64, 'base64')
+    return raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer
+}
+
 async function openAITTS(text: string, apiKey: string): Promise<ArrayBuffer> {
     const res = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',
@@ -79,10 +107,11 @@ export async function GET(
 ) {
     const { slug } = await params
 
+    const geminiKey = process.env.GEMINI_API_KEY
     const elevenKey = process.env.ELEVENLABS_API_KEY
     const openAIKey = process.env.OPENAI_API_KEY
 
-    if (!elevenKey && !openAIKey) {
+    if (!geminiKey && !elevenKey && !openAIKey) {
         return NextResponse.json({ error: 'TTS not configured' }, { status: 503 })
     }
 
@@ -115,18 +144,18 @@ export async function GET(
 
     let buffer: ArrayBuffer | null = null
 
-    try {
-        buffer = elevenKey
-            ? await elevenLabsTTS(text, elevenKey)
-            : await openAITTS(text, openAIKey!)
-    } catch (err) {
-        console.error('TTS error:', err)
-        if (elevenKey && openAIKey) {
-            try {
-                buffer = await openAITTS(text, openAIKey)
-            } catch (fallbackErr) {
-                console.error('OpenAI TTS fallback error:', fallbackErr)
-            }
+    const providers: Array<() => Promise<ArrayBuffer>> = [
+        ...(geminiKey ? [() => geminiTTS(text, geminiKey)] : []),
+        ...(elevenKey ? [() => elevenLabsTTS(text, elevenKey)] : []),
+        ...(openAIKey ? [() => openAITTS(text, openAIKey)] : []),
+    ]
+
+    for (const provider of providers) {
+        try {
+            buffer = await provider()
+            break
+        } catch (err) {
+            console.error('TTS provider failed, trying next:', err)
         }
     }
 
