@@ -40,9 +40,29 @@ const nextConfig: NextConfig = {
     } : false,
   },
 
-  // Headers for bfcache compatibility
   async headers() {
     return [
+      // Homepage: fully static — cache at CDN edge for 1 day, revalidate in background
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      // Dynamic pages (about, works, blog): always revalidate
+      {
+        source: '/(about|works|blog|writing|india-ai)(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+        ],
+      },
+      // All other pages: bfcache compatible
       {
         source: '/:path*',
         headers: [

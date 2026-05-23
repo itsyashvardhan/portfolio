@@ -18,7 +18,7 @@ export interface SiteConfig {
 }
 
 export const DEFAULT_SITE_CONFIG: SiteConfig = {
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com',
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://yashvardhan.dev',
     ownerName: process.env.NEXT_PUBLIC_OWNER_NAME || 'Your Name',
     ownerTitle: process.env.NEXT_PUBLIC_OWNER_TITLE || 'Software Engineer',
     ownerEmail: process.env.NEXT_PUBLIC_OWNER_EMAIL || 'email@example.com',
@@ -26,8 +26,8 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     ownerLinkedin: process.env.NEXT_PUBLIC_OWNER_LINKEDIN || 'https://linkedin.com/in/username',
     ownerTwitter: process.env.NEXT_PUBLIC_OWNER_TWITTER || '@username',
     heroName: process.env.NEXT_PUBLIC_HERO_NAME || 'यशवर्धन',
-    heroPhonetic: process.env.NEXT_PUBLIC_HERO_PHONETIC || '',
-    heroTagline: process.env.NEXT_PUBLIC_HERO_TAGLINE || 'I design systems that ship.',
+    heroPhonetic: process.env.NEXT_PUBLIC_HERO_PHONETIC || 'YASH · VAR · DHAN',
+    heroTagline: process.env.NEXT_PUBLIC_HERO_TAGLINE || 'I build AI systems that run at the edge.',
     logoText: process.env.NEXT_PUBLIC_LOGO_TEXT || '◈',
 }
 

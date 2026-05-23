@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'Works',
-    description: 'Selected projects and work where I owned the outcome.',
+    description: 'AI projects and data systems by Yashvardhan Singh — DiagFlo (NL-to-diagram engine), GetCred (ML credit scoring for unbanked India), and more.',
 }
 
 export default async function WorksPage() {

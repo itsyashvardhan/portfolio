@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'About',
-    description: 'Yashvardhan is an analyst focused on data, AI, systems, and customer-facing problem solving.',
+    description: 'AI & Data Systems Engineer specialising in edge ML inference and LLM infrastructure. Published at ICCCN 2026. Built production data pipelines at Medikabazaar.',
 }
 
 export default async function AboutPage() {
@@ -118,6 +118,37 @@ export default async function AboutPage() {
                             </div>
                         </section>
                     )}
+
+                    {/* Research Section */}
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Research</h2>
+                        <div className={styles.timeline}>
+                            <div className={styles.experienceCard}>
+                                <div className={styles.experienceHeader}>
+                                    <div>
+                                        <h3 className={styles.company}>On-Device AI — Vision Encoder Optimization for Edge Visual LLMs</h3>
+                                        <p className={styles.expRole}>Accepted · ICCCN 2026, UK</p>
+                                        <p className={styles.location}>EfficientNet (B0-B4) · EfficientFormer · MobileViT · Raspberry Pi 5 · Google Coral TPU · NVIDIA Jetson Orin Nano</p>
+                                    </div>
+                                    <span className={styles.duration}>2026</span>
+                                </div>
+                                <ul className={styles.highlights}>
+                                    <li>Measured vision encoders as the 70–85% TTFT bottleneck in edge VLLM deployments; benchmarked 8 architectures across 4 hardware platforms — 1.6 ms (EfficientFormer-L1) to 98.0 ms (ViT-Base) on identical hardware.</li>
+                                    <li>Introduced the Cache Cliff phenomenon and Sensory Bottleneck Hypothesis; produced a hardware-aware encoder selection matrix across three latency regimes: real-time (15 ms), interactive (100 ms), and batch (500 ms).</li>
+                                </ul>
+                            </div>
+                            <div className={styles.experienceCard}>
+                                <div className={styles.experienceHeader}>
+                                    <div>
+                                        <h3 className={styles.company}>A Systematic Review of Deep Learning Approaches for Motor Imagery EEG-Driven BCIs</h3>
+                                        <p className={styles.expRole}>Peer-reviewed · IIT Kharagpur · IEEE-format</p>
+                                        <p className={styles.location}>100+ studies synthesised · 17 architectures benchmarked on BCI Competition IV-2a</p>
+                                    </div>
+                                    <span className={styles.duration}>2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
                     {/* Skills Section */}
                     {hasSkills && (

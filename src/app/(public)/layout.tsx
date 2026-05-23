@@ -30,7 +30,7 @@ export default async function PublicLayout({
             <main className={styles.main}>{children}</main>
             <footer className={styles.footer}>
                 <div className="container">
-                    <p>© {new Date().getFullYear()} | Designed & built with intention.</p>
+                    <p>© {new Date().getFullYear()} Yashvardhan Singh — Built with obsessive intention.</p>
                 </div>
             </footer>
         </div>

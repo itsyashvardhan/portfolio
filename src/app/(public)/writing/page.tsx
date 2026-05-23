@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import { getBlogList } from '@/lib/data'
 import styles from './page.module.css'
+import type { Metadata } from 'next'
 
 // Render dynamically — requires DB access
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+    title: 'Writing',
+    description: 'Technical writing on edge AI, LLM infrastructure, and data systems engineering by Yashvardhan Singh.',
+}
 
 export default async function WritingPage() {
     const { articles } = await getBlogList()
@@ -18,7 +24,7 @@ export default async function WritingPage() {
                 <div className="container">
                     <h1 className={styles.title}>Blog</h1>
                     <p className={styles.description}>
-                        Thoughts on product engineering, systems design, and building with intention.
+                        Technical writing on edge AI, LLM infrastructure, and data systems engineering.
                     </p>
                 </div>
             </section>

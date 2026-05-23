@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
     title: 'Blog',
-    description: 'Thoughts on product engineering, systems design, and building with intention.',
+    description: 'Technical writing on edge AI, LLM infrastructure, and data systems engineering by Yashvardhan Singh.',
 }
 
 interface BlogPageProps {

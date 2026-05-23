@@ -39,19 +39,17 @@ export function generateMetadata(): Metadata {
   return {
     // Core
     title: {
-      default: `${ownerName} — ${ownerTitle}`,
-      template: `%s — ${ownerName}`
+      default: 'Yashvardhan Singh — AI & Data Systems Engineer',
+      template: '%s | Yashvardhan Singh',
     },
-    description: `${ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
+    description: 'AI & Data Systems Engineer building edge ML systems and LLM infrastructure. Published at ICCCN 2026. New Delhi, India.',
     keywords: [
-      ownerName,
-      "Product Engineer",
-      "Solutions Engineer",
-      "AI Developer",
-      "Systems Designer",
-      "Portfolio",
-      "Next.js",
-      "TypeScript",
+      'AI engineer',
+      'edge ML',
+      'LLM infrastructure',
+      'data pipelines',
+      'Yashvardhan Singh',
+      'ICCCN 2026',
     ],
 
     // Authorship
@@ -72,7 +70,7 @@ export function generateMetadata(): Metadata {
       url: siteUrl,
       siteName: ownerName,
       title: `${ownerName} — ${ownerTitle}`,
-      description: `${ownerTitle} specializing in systems design and building products with intention.`,
+      description: 'AI & Data Systems Engineer building edge ML systems and LLM infrastructure. Published at ICCCN 2026. New Delhi, India.',
       images: [
         {
           url: '/og-image.jpg',
@@ -87,7 +85,7 @@ export function generateMetadata(): Metadata {
     twitter: {
       card: "summary_large_image",
       title: `${ownerName} — ${ownerTitle}`,
-      description: `${ownerTitle} specializing in systems design and building products with intention.`,
+      description: 'AI & Data Systems Engineer building edge ML systems and LLM infrastructure. Published at ICCCN 2026.',
       images: ['/og-image.jpg'],
       creator: ownerTwitter,
     },
@@ -143,38 +141,34 @@ export default function RootLayout({
     })();
   `;
 
-  // JSON-LD structured data for SEO
-  const jsonLd = {
+  const jsonLdData = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: 'Your Name',
-    url: 'https://example.com',
-    image: 'https://example.com/og-image.jpg',
-    jobTitle: 'Software Engineer',
-    description: 'Software Engineer specializing in systems design, full-stack development, and building products with intention.',
-    sameAs: [
-      'https://github.com/username',
-      'https://linkedin.com/in/username',
-    ],
-    knowsAbout: ['Product Engineering', 'Systems Design', 'Development', 'TypeScript', 'Next.js'],
-  };
-
-  const jsonLdData = {
-    ...jsonLd,
     name: site.ownerName,
     url: site.siteUrl,
     image: `${site.siteUrl}/og-image.jpg`,
     jobTitle: site.ownerTitle,
-    description: `${site.ownerTitle} specializing in systems design, full-stack development, and building products with intention.`,
+    description: 'AI & Data Systems Engineer specialising in edge ML inference and LLM infrastructure. Published at ICCCN 2026 on vision encoder optimisation for edge VLLMs. Built production Kafka pipelines at Medikabazaar.',
     sameAs: [
       site.ownerGithub,
       site.ownerLinkedin,
     ],
+    knowsAbout: ['Edge ML Inference', 'LLM Infrastructure', 'Data Pipelines', 'Kafka', 'TensorRT', 'TFLite', 'Python', 'AWS', 'LangChain', 'MCP Server'],
+    alumniOf: {
+      '@type': 'CollegeOrUniversity',
+      name: 'KIIT University',
+      address: { '@type': 'PostalAddress', addressLocality: 'Bhubaneswar', addressCountry: 'IN' },
+    },
+    address: { '@type': 'PostalAddress', addressLocality: 'New Delhi', addressCountry: 'IN' },
   };
 
   return (
     <html lang="en" className={`${inter.variable} ${dotMatrix.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://diagflo.yashvardhan.dev" />
+        <link rel="dns-prefetch" href="https://getcred.yashvardhan.dev" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         {/* JSON-LD Structured Data */}
         <script
