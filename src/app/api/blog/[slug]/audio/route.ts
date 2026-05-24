@@ -202,15 +202,11 @@ const TTS_MODELS = [
     { id: 'gemini-2.5-flash-preview-tts', sampleRate: 24000 },
 ]
 
-async function multiSpeakerTTS(script: string, apiKey: string): Promise<{ pcm: Buffer; sampleRate: number }> {
-    const chunks = chunkScript(script)
-    let activeSampleRate = 48000
-    const pcmParts: Buffer[] = []
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
-    for (const chunk of chunks) {
-        let chunkPcm: Buffer | null = null
-
-        for (const model of TTS_MODELS) {
+async function ttsChunk(chunk: string, apiKey: string, retries = 4): Promise<{ pcm: Buffer; sampleRate: number }> {
+    for (const model of TTS_MODELS) {
+        for (let attempt = 0; attempt < retries; attempt++) {
             try {
                 const res = await fetch(
                     `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${apiKey}`,
@@ -224,14 +220,8 @@ async function multiSpeakerTTS(script: string, apiKey: string): Promise<{ pcm: B
                                 speech_config: {
                                     multi_speaker_voice_config: {
                                         speaker_voice_configs: [
-                                            {
-                                                speaker: 'Charon',
-                                                voice_config: { prebuilt_voice_config: { voice_name: 'Charon' } },
-                                            },
-                                            {
-                                                speaker: 'Aoede',
-                                                voice_config: { prebuilt_voice_config: { voice_name: 'Aoede' } },
-                                            },
+                                            { speaker: 'Aoede', voice_config: { prebuilt_voice_config: { voice_name: 'Aoede' } } },
+                                            { speaker: 'Charon', voice_config: { prebuilt_voice_config: { voice_name: 'Charon' } } },
                                         ],
                                     },
                                 },
@@ -240,29 +230,46 @@ async function multiSpeakerTTS(script: string, apiKey: string): Promise<{ pcm: B
                     }
                 )
 
-                if (res.status === 503 || res.status === 404) {
-                    console.warn(`${model.id} unavailable, trying fallback`)
+                if (res.status === 429) {
+                    // Rate limited — back off and retry same model
+                    const retryAfter = parseInt(res.headers.get('retry-after') || '30', 10) * 1000
+                    const backoff = Math.max(retryAfter, (attempt + 1) * 12000)
+                    console.warn(`Rate limited on ${model.id}, waiting ${backoff}ms`)
+                    await sleep(backoff)
                     continue
                 }
+                if (res.status === 503 || res.status === 404) break  // try next model
+
                 if (!res.ok) throw new Error(`TTS ${model.id}: ${res.status} ${await res.text()}`)
 
                 const json = await res.json()
                 const b64 = json.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data as string | undefined
-                if (!b64) throw new Error(`${model.id}: no audio data in response`)
+                if (!b64) throw new Error(`${model.id}: no audio data`)
 
-                chunkPcm = Buffer.from(b64, 'base64')
-                activeSampleRate = model.sampleRate
-                break
+                return { pcm: Buffer.from(b64, 'base64'), sampleRate: model.sampleRate }
             } catch (err) {
-                console.error(`TTS model ${model.id} failed:`, err)
+                console.error(`TTS ${model.id} attempt ${attempt + 1} failed:`, err)
+                if (attempt < retries - 1) await sleep(5000)
             }
         }
+    }
+    throw new Error('All TTS models exhausted')
+}
 
-        if (!chunkPcm) throw new Error('All TTS models failed for chunk')
-        pcmParts.push(chunkPcm)
+async function multiSpeakerTTS(script: string, apiKey: string): Promise<{ pcm: Buffer; sampleRate: number }> {
+    const chunks = chunkScript(script)
+    const pcmParts: Buffer[] = []
+    let sampleRate = 24000
+
+    for (let i = 0; i < chunks.length; i++) {
+        const result = await ttsChunk(chunks[i], apiKey)
+        pcmParts.push(result.pcm)
+        sampleRate = result.sampleRate
+        // Brief pause between chunks to respect rate limits
+        if (i < chunks.length - 1) await sleep(2000)
     }
 
-    return { pcm: Buffer.concat(pcmParts), sampleRate: activeSampleRate }
+    return { pcm: Buffer.concat(pcmParts), sampleRate }
 }
 
 // ---------------------------------------------------------------------------
