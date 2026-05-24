@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useAudio } from '@/context/audio-context'
 
 interface AudioPlayerProps {
@@ -8,7 +9,10 @@ interface AudioPlayerProps {
 }
 
 export function AudioPlayer({ slug, title }: AudioPlayerProps) {
-    const { state, track, progress, duration, load, seek, skip } = useAudio()
+    const { state, track, progress, duration, load, seek, skip, preload } = useAudio()
+
+    // Begin buffering as soon as the blog post renders — play is instant on click
+    useEffect(() => { preload(slug) }, [slug, preload])
 
     const isThis = track?.slug === slug
     const activeState = isThis ? state : 'idle'

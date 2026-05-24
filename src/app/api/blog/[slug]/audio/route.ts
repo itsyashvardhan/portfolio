@@ -73,7 +73,7 @@ function encodeAAC(wav: Buffer): Promise<Buffer> {
         ffmpeg(input)
             .inputFormat('wav')
             .audioCodec('aac')
-            .audioBitrate('96k')
+            .audioBitrate('64k')
             .audioChannels(1)
             .format('adts')   // raw ADTS AAC — universal browser support
             .on('error', reject)
@@ -81,12 +81,30 @@ function encodeAAC(wav: Buffer): Promise<Buffer> {
     })
 }
 
-function aacResponse(aac: Buffer) {
+function aacResponse(aac: Buffer, rangeHeader?: string | null) {
+    const total = aac.byteLength
+    if (rangeHeader) {
+        const [startStr, endStr] = rangeHeader.replace(/bytes=/, '').split('-')
+        const start = parseInt(startStr, 10)
+        const end = endStr ? parseInt(endStr, 10) : total - 1
+        const chunk = aac.slice(start, end + 1)
+        return new NextResponse(toArrayBuffer(chunk), {
+            status: 206,
+            headers: {
+                'Content-Type': 'audio/aac',
+                'Content-Range': `bytes ${start}-${end}/${total}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunk.byteLength.toString(),
+                'Cache-Control': 'public, max-age=31536000, immutable',
+            },
+        })
+    }
     return new NextResponse(toArrayBuffer(aac), {
         headers: {
             'Content-Type': 'audio/aac',
+            'Accept-Ranges': 'bytes',
             'Cache-Control': 'public, max-age=31536000, immutable',
-            'Content-Length': aac.byteLength.toString(),
+            'Content-Length': total.toString(),
         },
     })
 }
@@ -252,10 +270,11 @@ async function multiSpeakerTTS(script: string, apiKey: string): Promise<{ pcm: B
 // ---------------------------------------------------------------------------
 
 export async function GET(
-    _req: NextRequest,
+    req: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params
+    const rangeHeader = req.headers.get('range')
     const geminiKey = process.env.GEMINI_API_KEY
 
     if (!geminiKey) {
@@ -285,7 +304,7 @@ export async function GET(
 
         if (cached && cached.content_hash === hash) {
             const aac = Buffer.from(cached.audio_b64, 'base64')
-            return aacResponse(aac)
+            return aacResponse(aac, rangeHeader)
         }
     } catch {
         // cache unavailable — generate fresh
@@ -312,7 +331,7 @@ export async function GET(
             })
             .catch((e) => console.error('podcast cache write failed:', e))
 
-        return aacResponse(aac)
+        return aacResponse(aac, rangeHeader)
     } catch (err) {
         console.error('Podcast generation failed:', err)
         return NextResponse.json({ error: 'Podcast generation failed' }, { status: 502 })

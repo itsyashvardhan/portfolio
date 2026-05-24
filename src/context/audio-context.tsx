@@ -7,7 +7,6 @@ type AudioState = 'idle' | 'loading' | 'playing' | 'paused' | 'error'
 interface AudioTrack {
     slug: string
     title: string
-    url: string
 }
 
 interface AudioContextValue {
@@ -15,10 +14,11 @@ interface AudioContextValue {
     track: AudioTrack | null
     progress: number
     duration: number
-    load: (slug: string, title: string) => Promise<void>
+    load: (slug: string, title: string) => void
     toggle: () => void
     seek: (ratio: number) => void
     skip: (seconds: number) => void
+    preload: (slug: string) => void
 }
 
 const AudioCtx = createContext<AudioContextValue | null>(null)
@@ -29,6 +29,10 @@ export function useAudio() {
     return ctx
 }
 
+function apiUrl(slug: string) {
+    return `/api/blog/${slug}/audio`
+}
+
 export function AudioProvider({ children }: { children: React.ReactNode }) {
     const audioRef = useRef<HTMLAudioElement | null>(null)
     const [state, setState] = useState<AudioState>('idle')
@@ -36,40 +40,55 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const [progress, setProgress] = useState(0)
     const [duration, setDuration] = useState(0)
 
-    // Stable audio element — created once, never torn down
     useEffect(() => {
         if (audioRef.current) return
         const audio = new Audio()
         audio.preload = 'none'
         audioRef.current = audio
 
-        const onTime = () => setProgress(audio.currentTime)
-        const onMeta = () => setDuration(audio.duration)
-        const onEnd = () => setState('paused')
+        const onTime  = () => setProgress(audio.currentTime)
+        const onMeta  = () => setDuration(audio.duration)
+        const onEnd   = () => setState('paused')
         const onError = () => setState('error')
+        // When enough data is buffered to start playing, clear loading state
+        const onCanPlay = () => {
+            setState(prev => prev === 'loading' ? 'paused' : prev)
+        }
 
         audio.addEventListener('timeupdate', onTime)
         audio.addEventListener('loadedmetadata', onMeta)
         audio.addEventListener('ended', onEnd)
         audio.addEventListener('error', onError)
+        audio.addEventListener('canplay', onCanPlay)
 
         return () => {
             audio.removeEventListener('timeupdate', onTime)
             audio.removeEventListener('loadedmetadata', onMeta)
             audio.removeEventListener('ended', onEnd)
             audio.removeEventListener('error', onError)
+            audio.removeEventListener('canplay', onCanPlay)
             audio.pause()
         }
     }, [])
 
-    const load = useCallback(async (slug: string, title: string) => {
+    // Preload: set src + buffer silently so play is instant
+    const preload = useCallback((slug: string) => {
+        const audio = audioRef.current
+        if (!audio) return
+        if (audio.src.endsWith(apiUrl(slug))) return  // already set
+        audio.src = apiUrl(slug)
+        audio.preload = 'auto'
+        // Don't play — just let the browser buffer
+    }, [])
+
+    const load = useCallback((slug: string, title: string) => {
         const audio = audioRef.current
         if (!audio) return
 
-        // Already loaded — just toggle
+        // Same track — toggle play/pause
         if (track?.slug === slug) {
             if (audio.paused) {
-                audio.play().catch(() => setState('paused'))
+                audio.play().catch(() => setState('error'))
                 setState('playing')
             } else {
                 audio.pause()
@@ -78,47 +97,42 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             return
         }
 
-        setState('loading')
-        try {
-            const res = await fetch(`/api/blog/${slug}/audio`)
-            if (!res.ok) throw new Error('fetch failed')
-            const blob = await res.blob()
-            const url = URL.createObjectURL(blob)
-
-            // Revoke previous object URL
-            if (track?.url) URL.revokeObjectURL(track.url)
-
-            audio.src = url
-            setTrack({ slug, title, url })
-            setProgress(0)
-            setDuration(0)
-
-            await audio.play()
-            setState('playing')
-
-            // Media Session API — shows in OS/browser media controls
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title,
-                    artist: 'Yashvardhan Singh',
-                    album: 'yashvardhan.dev',
-                })
-                navigator.mediaSession.setActionHandler('play', () => { audio.play(); setState('playing') })
-                navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); setState('paused') })
-                navigator.mediaSession.setActionHandler('seekto', (d) => {
-                    if (d.seekTime != null) audio.currentTime = d.seekTime
-                })
-            }
-        } catch {
-            setState('error')
+        // New track — src may already be preloaded or needs setting
+        if (!audio.src.endsWith(apiUrl(slug))) {
+            audio.src = apiUrl(slug)
+            audio.preload = 'auto'
         }
+
+        setTrack({ slug, title })
+        setProgress(0)
+        setDuration(0)
+        setState('loading')
+
+        // play() will succeed once enough is buffered; browser shows loading state meanwhile
+        audio.play()
+            .then(() => {
+                setState('playing')
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title,
+                        artist: 'Yashvardhan Singh',
+                        album: 'yashvardhan.dev',
+                    })
+                    navigator.mediaSession.setActionHandler('play',  () => { audio.play(); setState('playing') })
+                    navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); setState('paused') })
+                    navigator.mediaSession.setActionHandler('seekto', (d) => {
+                        if (d.seekTime != null) audio.currentTime = d.seekTime
+                    })
+                }
+            })
+            .catch(() => setState('error'))
     }, [track])
 
     const toggle = useCallback(() => {
         const audio = audioRef.current
         if (!audio) return
         if (audio.paused) {
-            audio.play().catch(() => setState('paused'))
+            audio.play().catch(() => setState('error'))
             setState('playing')
         } else {
             audio.pause()
@@ -139,7 +153,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     return (
-        <AudioCtx.Provider value={{ state, track, progress, duration, load, toggle, seek, skip }}>
+        <AudioCtx.Provider value={{ state, track, progress, duration, load, toggle, seek, skip, preload }}>
             {children}
         </AudioCtx.Provider>
     )
