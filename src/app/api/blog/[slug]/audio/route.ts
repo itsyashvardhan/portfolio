@@ -67,23 +67,47 @@ function wavResponse(wav: Buffer) {
 // Step 1: Generate podcast script via Gemini text model
 // ---------------------------------------------------------------------------
 
-const SCRIPT_PROMPT = `You are converting a technical blog post into a two-person podcast dialogue.
+// ---------------------------------------------------------------------------
+// Podcast script prompt — generic template, works for any blog post.
+// Voices: Aoede (female host) + Charon (male researcher/author).
+// ---------------------------------------------------------------------------
+const SCRIPT_PROMPT = `You are producing a structured audio podcast from a technical blog post.
 
-Speakers:
-- Charon: analytical critic. Asks probing questions, challenges assumptions, wants to know why things matter. Delivers with skepticism but genuine curiosity.
-- Aoede: engaging host. Reframes Charon's challenges accessibly, keeps the energy up, draws out the insight.
+SPEAKERS
+- Aoede [female, host]: warm, curious, accessible. Introduces topics, guides the listener, asks clarifying questions, and bridges between sections. Keeps energy up without being hollow.
+- Charon [male, researcher]: precise, authoritative, slightly dry. Explains findings as if he wrote them. Challenges surface-level readings and adds depth.
 
-Rules:
-- Use ONLY information from the blog post — no invented facts, no padding
-- Every line must start with exactly "Charon: " or "Aoede: "
-- Use inline delivery cues in square brackets (e.g. [skeptical], [curious], [excited], [thoughtful]) — 2–4 per speaker total, only where they add meaning
-- Cover ALL sections of the blog post — do not skip or summarise over any part
-- Aim for 20–28 exchanges, roughly 900–1200 words total
-- Aoede opens with: "Welcome to the blog of Yashvardhan Singh. Today we are discussing [post title]."
-- Aoede closes with: "That was a post by Yashvardhan Singh. Find more at yashvardhan.dev."
-- The opening and closing lines must not be altered or paraphrased
+PODCAST STRUCTURE — follow this order exactly:
 
-Blog post:
+1. HEADING
+   Aoede opens with exactly:
+   "Welcome to ya·sh·var·dhan dot dev. I'm your host, and joining me today is the researcher behind this post. We're covering: [exact blog post title]."
+
+2. TOPICS IN CRUX (overview)
+   Aoede briefly lists the 3–5 core topics the post covers, in plain language. Charon confirms and adds one sentence of framing for why any of this matters.
+
+3. SECTION-BY-SECTION (body)
+   Work through every section of the blog post in order — do not skip, merge, or paraphrase entire sections.
+   - Each section starts with Aoede naming it: "[Skeptical/Curious/etc.] So the next part is about [section heading]…"
+   - Charon explains the core idea of that section accurately, using the post as the sole source.
+   - Aoede asks at least one follow-up per section that a non-expert listener would ask.
+   - Charon answers. Include key data, thresholds, names, and findings from the post verbatim where they matter.
+
+4. ENDING NOTE
+   Aoede: summarise the single most important takeaway from the post in one sentence. Charon: one sentence on what changes if you apply this.
+
+5. CREDITS
+   Aoede closes with exactly:
+   "This was a post by Yashvardhan Singh — ya·sh·var·dhan — published at ya·sh·var·dhan dot dev. If this resonated, share it. See you next time."
+
+RULES
+- Every line must start with exactly "Aoede: " or "Charon: "
+- Use ONLY information from the blog post — no invented facts, no filler
+- Inline delivery cues in square brackets (e.g. [curious], [skeptical], [measured], [warm]) — use sparingly, only where delivery meaningfully changes
+- Aim for 24–32 exchanges, 1000–1400 words
+- Do not alter or paraphrase the HEADING or CREDITS lines
+
+BLOG POST:
 `
 
 async function generateScript(articleText: string, apiKey: string): Promise<string> {
