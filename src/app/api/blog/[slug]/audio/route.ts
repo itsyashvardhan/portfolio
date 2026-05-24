@@ -60,6 +60,8 @@ function toArrayBuffer(buf: Buffer): ArrayBuffer {
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer
 }
 
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+
 // Transcode WAV PCM → AAC/M4A at 96 kbps (mid of 64–128 range)
 function encodeAAC(wav: Buffer): Promise<Buffer> {
     return new Promise((resolve, reject) => {
@@ -156,23 +158,38 @@ RULES
 BLOG POST:
 `
 
-async function generateScript(articleText: string, apiKey: string): Promise<string> {
-    const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText }] }],
-                generationConfig: { maxOutputTokens: 16384, temperature: 0.5 },
-            }),
+const SCRIPT_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite']
+
+async function generateScript(articleText: string, apiKey: string, retries = 3): Promise<string> {
+    for (const model of SCRIPT_MODELS) {
+        for (let attempt = 0; attempt < retries; attempt++) {
+            const res = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText }] }],
+                        generationConfig: { maxOutputTokens: 16384, temperature: 0.5 },
+                    }),
+                }
+            )
+            if (res.status === 429) {
+                const retryAfter = parseInt(res.headers.get('retry-after') || '30', 10) * 1000
+                const backoff = Math.max(retryAfter, (attempt + 1) * 15000)
+                console.warn(`Script gen rate limited on ${model}, waiting ${backoff}ms`)
+                await sleep(backoff)
+                continue
+            }
+            if (res.status === 503 || res.status === 404) break  // try next model
+            if (!res.ok) throw new Error(`Script generation failed: ${res.status} ${await res.text()}`)
+            const json = await res.json()
+            const script = json.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined
+            if (!script) throw new Error('Script generation: empty response')
+            return script.trim()
         }
-    )
-    if (!res.ok) throw new Error(`Script generation failed: ${res.status} ${await res.text()}`)
-    const json = await res.json()
-    const script = json.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined
-    if (!script) throw new Error('Script generation: empty response')
-    return script.trim()
+    }
+    throw new Error('All script generation models exhausted')
 }
 
 // ---------------------------------------------------------------------------
@@ -198,11 +215,9 @@ function chunkScript(script: string, maxChars = 12000): string[] {
 }
 
 const TTS_MODELS = [
-    { id: 'gemini-3.1-flash-tts-preview', sampleRate: 24000 },
     { id: 'gemini-2.5-flash-preview-tts', sampleRate: 24000 },
+    { id: 'gemini-3.1-flash-tts-preview', sampleRate: 24000 },
 ]
-
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
 async function ttsChunk(chunk: string, apiKey: string, retries = 4): Promise<{ pcm: Buffer; sampleRate: number }> {
     for (const model of TTS_MODELS) {
@@ -319,14 +334,20 @@ export async function GET(
 
     try {
         // Step 1: Convert blog post to podcast script
+        console.log('[audio] generating script for', slug)
         const script = await generateScript(articleText, geminiKey)
+        console.log('[audio] script length', script.length)
 
         // Step 2: Synthesise dual-voice PCM
+        console.log('[audio] starting TTS')
         const { pcm, sampleRate } = await multiSpeakerTTS(script, geminiKey)
+        console.log('[audio] TTS done, pcm bytes', pcm.length)
 
-        // Step 3: WAV wrapper → AAC 96 kbps
+        // Step 3: WAV wrapper → AAC 64 kbps
+        console.log('[audio] encoding AAC')
         const wav = pcmToWav(pcm, sampleRate)
         const aac = await encodeAAC(wav)
+        console.log('[audio] AAC bytes', aac.length)
 
         // Persist — upsert so stale entries are replaced on content change
         const b64 = aac.toString('base64')
