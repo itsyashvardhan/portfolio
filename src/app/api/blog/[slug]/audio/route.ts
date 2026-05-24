@@ -77,8 +77,11 @@ Rules:
 - Use ONLY information from the blog post — no invented facts, no padding
 - Every line must start with exactly "Charon: " or "Aoede: "
 - Use inline delivery cues in square brackets (e.g. [skeptical], [curious], [excited], [thoughtful]) — 2–4 per speaker total, only where they add meaning
-- Aim for 10–16 exchanges (Charon/Aoede turns), roughly 500–800 words total
-- Start with Aoede setting the scene, end with a clear takeaway
+- Cover ALL sections of the blog post — do not skip or summarise over any part
+- Aim for 20–28 exchanges, roughly 900–1200 words total
+- Aoede opens with: "Welcome to the blog of Yashvardhan Singh. Today we are discussing [post title]."
+- Aoede closes with: "That was a post by Yashvardhan Singh. Find more at yashvardhan.dev."
+- The opening and closing lines must not be altered or paraphrased
 
 Blog post:
 `
@@ -90,7 +93,7 @@ async function generateScript(articleText: string, apiKey: string): Promise<stri
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText.slice(0, 12000) }] }],
+                contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText }] }],
                 generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
             }),
         }

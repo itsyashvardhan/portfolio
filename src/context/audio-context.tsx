@@ -18,6 +18,7 @@ interface AudioContextValue {
     load: (slug: string, title: string) => Promise<void>
     toggle: () => void
     seek: (ratio: number) => void
+    skip: (seconds: number) => void
 }
 
 const AudioCtx = createContext<AudioContextValue | null>(null)
@@ -131,8 +132,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         audio.currentTime = ratio * duration
     }, [duration])
 
+    const skip = useCallback((seconds: number) => {
+        const audio = audioRef.current
+        if (!audio) return
+        audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + seconds))
+    }, [])
+
     return (
-        <AudioCtx.Provider value={{ state, track, progress, duration, load, toggle, seek }}>
+        <AudioCtx.Provider value={{ state, track, progress, duration, load, toggle, seek, skip }}>
             {children}
         </AudioCtx.Provider>
     )
