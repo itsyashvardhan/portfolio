@@ -118,7 +118,7 @@ async function generateScript(articleText: string, apiKey: string): Promise<stri
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText }] }],
-                generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
+                generationConfig: { maxOutputTokens: 16384, temperature: 0.5 },
             }),
         }
     )
