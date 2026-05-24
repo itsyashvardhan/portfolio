@@ -84,7 +84,7 @@ PODCAST STRUCTURE — follow this order exactly:
    "Welcome to ya·sh·var·dhan dot dev. I'm your host, and joining me today is the researcher behind this post. We're covering: [exact blog post title]."
 
 2. TOPICS IN CRUX (overview)
-   Aoede briefly lists the 3–5 core topics the post covers, in plain language. Charon confirms and adds one sentence of framing for why any of this matters.
+   Aoede lists every section heading from the blog post, in order, as a preview of what's coming. Charon adds one sentence on why this body of work matters as a whole.
 
 3. SECTION-BY-SECTION (body)
    Work through every section of the blog post in order — do not skip, merge, or paraphrase entire sections.
@@ -104,7 +104,7 @@ RULES
 - Every line must start with exactly "Aoede: " or "Charon: "
 - Use ONLY information from the blog post — no invented facts, no filler
 - Inline delivery cues in square brackets (e.g. [curious], [skeptical], [measured], [warm]) — use sparingly, only where delivery meaningfully changes
-- Aim for 24–32 exchanges, 1000–1400 words
+- Length: cover every section fully — there is no word or time limit. Do not compress or skip content to fit a target length.
 - Do not alter or paraphrase the HEADING or CREDITS lines
 
 BLOG POST:
@@ -118,7 +118,7 @@ async function generateScript(articleText: string, apiKey: string): Promise<stri
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: SCRIPT_PROMPT + articleText }] }],
-                generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
+                generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
             }),
         }
     )
