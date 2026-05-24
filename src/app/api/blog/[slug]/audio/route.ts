@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const maxDuration = 300 // 5 min — only runs once per post, then cached
+
 import { eq } from 'drizzle-orm'
 import { createHash } from 'crypto'
+import { Readable, PassThrough } from 'stream'
+import ffmpeg from 'fluent-ffmpeg'
+import ffmpegStatic from 'ffmpeg-static'
+
+// Point fluent-ffmpeg at the static binary
+if (ffmpegStatic) ffmpeg.setFfmpegPath(ffmpegStatic)
 import { getBlogBySlug } from '@/lib/data'
 import { fallbackBlogPosts } from '@/lib/fallback-content'
 import { db, schema } from '@/lib/db'
@@ -30,7 +37,7 @@ function contentHash(text: string): string {
     return createHash('sha256').update(text).digest('hex').slice(0, 16)
 }
 
-function pcmToWav(pcm: Buffer, sampleRate = 48000, channels = 1, bitsPerSample = 16): Buffer {
+function pcmToWav(pcm: Buffer, sampleRate = 24000, channels = 1, bitsPerSample = 16): Buffer {
     const dataLen = pcm.byteLength
     const header = Buffer.alloc(44)
     header.write('RIFF', 0)
@@ -53,12 +60,33 @@ function toArrayBuffer(buf: Buffer): ArrayBuffer {
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer
 }
 
-function wavResponse(wav: Buffer) {
-    return new NextResponse(toArrayBuffer(wav), {
+// Transcode WAV PCM → AAC/M4A at 96 kbps (mid of 64–128 range)
+function encodeAAC(wav: Buffer): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const chunks: Buffer[] = []
+        const input = new Readable({ read() { this.push(wav); this.push(null) } })
+        const output = new PassThrough()
+        output.on('data', (chunk: Buffer) => chunks.push(chunk))
+        output.on('end', () => resolve(Buffer.concat(chunks)))
+        output.on('error', reject)
+
+        ffmpeg(input)
+            .inputFormat('wav')
+            .audioCodec('aac')
+            .audioBitrate('96k')
+            .audioChannels(1)
+            .format('adts')   // raw ADTS AAC — universal browser support
+            .on('error', reject)
+            .pipe(output, { end: true })
+    })
+}
+
+function aacResponse(aac: Buffer) {
+    return new NextResponse(toArrayBuffer(aac), {
         headers: {
-            'Content-Type': 'audio/wav',
+            'Content-Type': 'audio/aac',
             'Cache-Control': 'public, max-age=31536000, immutable',
-            'Content-Length': wav.byteLength.toString(),
+            'Content-Length': aac.byteLength.toString(),
         },
     })
 }
@@ -256,8 +284,8 @@ export async function GET(
             .limit(1)
 
         if (cached && cached.content_hash === hash) {
-            const wav = Buffer.from(cached.audio_b64, 'base64')
-            return wavResponse(wav)
+            const aac = Buffer.from(cached.audio_b64, 'base64')
+            return aacResponse(aac)
         }
     } catch {
         // cache unavailable — generate fresh
@@ -267,12 +295,15 @@ export async function GET(
         // Step 1: Convert blog post to podcast script
         const script = await generateScript(articleText, geminiKey)
 
-        // Step 2: Synthesise dual-voice audio
+        // Step 2: Synthesise dual-voice PCM
         const { pcm, sampleRate } = await multiSpeakerTTS(script, geminiKey)
+
+        // Step 3: WAV wrapper → AAC 96 kbps
         const wav = pcmToWav(pcm, sampleRate)
+        const aac = await encodeAAC(wav)
 
         // Persist — upsert so stale entries are replaced on content change
-        const b64 = wav.toString('base64')
+        const b64 = aac.toString('base64')
         db.insert(schema.podcastCache)
             .values({ slug, audio_b64: b64, content_hash: hash })
             .onConflictDoUpdate({
@@ -281,7 +312,7 @@ export async function GET(
             })
             .catch((e) => console.error('podcast cache write failed:', e))
 
-        return wavResponse(wav)
+        return aacResponse(aac)
     } catch (err) {
         console.error('Podcast generation failed:', err)
         return NextResponse.json({ error: 'Podcast generation failed' }, { status: 502 })
