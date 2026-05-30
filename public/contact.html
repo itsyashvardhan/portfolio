@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yashvardhan Singh - Contact</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 60px 44px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(217, 176, 94, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -40%;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(217, 176, 94, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .name {
+            font-family: 'Cormorant', serif;
+            font-size: 52px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -1.2px;
+            line-height: 1.05;
+        }
+
+        .tagline {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .buttons-section {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeInUp 0.6s ease-out 0.2s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-decoration: none;
+            color: #0f172a;
+        }
+
+        .contact-btn:hover {
+            background: #f1f5f9;
+            border-color: #d9b05e;
+            box-shadow: 0 8px 24px rgba(217, 176, 94, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .contact-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f172a 100%);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .contact-btn:hover .btn-icon {
+            background: linear-gradient(135deg, #d9b05e 0%, #c9a24a 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+        }
+
+        .btn-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-value {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .btn-arrow {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(217, 176, 94, 0.1);
+            color: #d9b05e;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .contact-btn:hover .btn-arrow {
+            background: #d9b05e;
+            color: #0f172a;
+            transform: translateX(3px);
+        }
+
+        /* Individual button delays */
+        .contact-btn:nth-child(1) { animation-delay: 0.1s; }
+        .contact-btn:nth-child(2) { animation-delay: 0.15s; }
+        .contact-btn:nth-child(3) { animation-delay: 0.2s; }
+        .contact-btn:nth-child(4) { animation-delay: 0.25s; }
+        .contact-btn:nth-child(5) { animation-delay: 0.3s; }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 48px 32px;
+            }
+
+            .name {
+                font-size: 44px;
+            }
+
+            .buttons-section {
+                gap: 10px;
+                margin-top: 40px;
+            }
+
+            .contact-btn {
+                padding: 14px 16px;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+
+        /* Premium card hover effect */
+        .card:hover {
+            box-shadow: 0 24px 72px rgba(217, 176, 94, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="content">
+                <div class="header">
+                    <h1 class="name">Yashvardhan Singh</h1>
+                    <p class="tagline">Founder</p>
+                </div>
+
+                <div class="buttons-section">
+                    <a href="https://linkedin.com/in/Yashvardhan04" target="_blank" class="contact-btn">
+                        <div class="btn-left">
+                            <div class="btn-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z" fill="white"/>
+                                </svg>
+                            </div>
+                            <div class="btn-label">
+                                <span class="btn-title">LinkedIn</span>
+                                <span class="btn-value">Yashvardhan04</span>
+                            </div>
+                        </div>
+                        <div class="btn-arrow">→</div>
+                    </a>
+
+                    <a href="https://getcred.yashvardhan.dev/lenders" target="_blank" class="contact-btn">
+                        <div class="btn-left">
+                            <div class="btn-icon">
+                                💼
+                            </div>
+                            <div class="btn-label">
+                                <span class="btn-title">Work</span>
+                                <span class="btn-value">GetCred Platform</span>
+                            </div>
+                        </div>
+                        <div class="btn-arrow">→</div>
+                    </a>
+
+                    <a href="https://yashvardhan.dev" target="_blank" class="contact-btn">
+                        <div class="btn-left">
+                            <div class="btn-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="white"/>
+                                </svg>
+                            </div>
+                            <div class="btn-label">
+                                <span class="btn-title">Portfolio</span>
+                                <span class="btn-value">yashvardhan.dev</span>
+                            </div>
+                        </div>
+                        <div class="btn-arrow">→</div>
+                    </a>
+
+                    <a href="mailto:mail@yashvardhan.dev" class="contact-btn">
+                        <div class="btn-left">
+                            <div class="btn-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="white"/>
+                                </svg>
+                            </div>
+                            <div class="btn-label">
+                                <span class="btn-title">Email</span>
+                                <span class="btn-value">mail@yashvardhan.dev</span>
+                            </div>
+                        </div>
+                        <div class="btn-arrow">→</div>
+                    </a>
+
+                    <a href="tel:+919315354393" class="contact-btn">
+                        <div class="btn-left">
+                            <div class="btn-icon">
+                                ☎️
+                            </div>
+                            <div class="btn-label">
+                                <span class="btn-title">Phone</span>
+                                <span class="btn-value">+91 9315354393</span>
+                            </div>
+                        </div>
+                        <div class="btn-arrow">→</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
